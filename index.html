@@ -3,30 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Time Tracker</title>
+    <title>TimeTracker Pro - Employee Time Management</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
     
+    <!-- Chart.js for reports -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #f093fb;
+            --success-color: #68d391;
+            --danger-color: #fc8181;
+            --warning-color: #f6ad55;
+            --info-color: #63b3ed;
+            --light-color: #f7fafc;
+            --dark-color: #2d3748;
             --white: #ffffff;
-            --gray-100: #f8f9fa;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-600: #6c757d;
-            --gray-700: #495057;
-            --gray-800: #343a40;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -36,19 +61,20 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: var(--gray-100);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--gray-800);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* Loading Overlay */
+        /* Enhanced Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -56,6 +82,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -69,21 +96,20 @@
         }
 
         .loading-spinner {
+            width: 60px;
+            height: 60px;
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top: 4px solid white;
-            width: 50px;
-            height: 50px;
+            border-top-color: white;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* Custom Popup */
+        /* Enhanced Popup System */
         .popup {
             position: fixed;
             top: 0;
@@ -91,10 +117,12 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10000;
+            animation: fadeIn 0.3s ease;
         }
 
         .popup.hidden {
@@ -103,31 +131,52 @@
 
         .popup-content {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
             text-align: center;
-            max-width: 400px;
+            max-width: 450px;
             width: 90%;
             position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .popup-close {
             position: absolute;
-            top: 10px;
-            right: 15px;
+            top: 15px;
+            right: 20px;
             font-size: 24px;
             cursor: pointer;
-            color: var(--gray-600);
+            color: var(--gray-400);
+            transition: var(--transition);
         }
 
         .popup-close:hover {
-            color: var(--gray-800);
+            color: var(--gray-600);
+            transform: scale(1.1);
         }
 
         .popup-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .popup.success .popup-icon::before {
@@ -142,127 +191,299 @@
             content: "ℹ️";
         }
 
+        .popup.warning .popup-icon::before {
+            content: "⚠️";
+        }
+
         /* View Management */
         .view {
             display: none;
+            animation: fadeIn 0.5s ease;
         }
 
         .view.active {
             display: block;
         }
 
-        /* Employee Interface */
+        /* Enhanced Employee Interface */
         .employee-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .employee-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-primary);
         }
 
         .employee-header h1 {
-            color: var(--primary-color);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 15px;
             font-size: 2.5rem;
+            font-weight: 700;
         }
 
         .employee-id {
             font-size: 1.3rem;
             color: var(--gray-600);
             font-weight: 600;
+            margin-bottom: 20px;
         }
 
+        /* Status Indicator */
+        .status-card {
+            background: var(--gradient-success);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .status-card.clocked-out {
+            background: var(--gradient-secondary);
+        }
+
+        .status-card i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Enhanced Time Tracking */
         .time-tracking {
             background: white;
             padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
             margin-bottom: 30px;
+            position: relative;
+        }
+
+        .current-time-display {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Courier New', monospace;
         }
 
         .tracking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* Enhanced Buttons */
+        .btn {
+            padding: 18px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn--primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn--success {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--success:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn--danger {
+            background: var(--gradient-secondary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--danger:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn--secondary {
+            background: var(--gray-600);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--secondary:hover {
+            background: var(--gray-700);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn--lg {
+            padding: 25px 35px;
+            font-size: 1.3rem;
+            min-height: 90px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-icon {
+            font-size: 2rem;
+        }
+
+        .tracking-btn {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tracking-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Quick Stats Dashboard */
+        .quick-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
         }
 
-        .btn--primary {
-            background-color: var(--primary-color);
-            color: white;
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
-        .btn--primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
         }
 
-        .btn--success {
-            background-color: var(--success-color);
-            color: white;
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 500;
+            margin-top: 5px;
         }
 
-        .btn--danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .btn--secondary {
-            background-color: var(--gray-600);
-            color: white;
-        }
-
-        .btn--lg {
-            padding: 20px 30px;
-            font-size: 1.2rem;
-            min-height: 80px;
-        }
-
-        .btn-icon {
-            font-size: 1.5em;
-        }
-
-        .tracking-btn {
-            width: 100%;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* History View */
+        /* Enhanced History View */
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .history-filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-600);
         }
 
         .history-content {
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
         }
 
+        /* Enhanced Tables */
         .table-container {
             overflow-x: auto;
         }
@@ -273,129 +494,194 @@
         }
 
         th, td {
-            padding: 15px;
+            padding: 18px 20px;
             text-align: left;
             border-bottom: 1px solid var(--gray-200);
         }
 
         th {
-            background-color: var(--gray-100);
+            background: var(--gray-50);
             font-weight: 600;
             color: var(--gray-700);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         tr:hover {
-            background-color: var(--gray-100);
+            background-color: var(--gray-50);
         }
 
         .location-link {
             color: var(--primary-color);
             text-decoration: none;
-            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: var(--transition);
         }
 
         .location-link:hover {
-            text-decoration: underline;
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
         }
 
         .total-hours {
-            padding: 20px;
-            background-color: var(--light-color);
-            font-size: 1.2rem;
-            font-weight: 600;
+            padding: 30px;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
             text-align: center;
-            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
 
-        /* Admin Interface */
+        /* Enhanced Admin Interface */
         .admin-login {
-            max-width: 400px;
+            max-width: 450px;
             margin: 100px auto;
             background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 50px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-primary);
         }
 
         .admin-login h2 {
             text-align: center;
-            margin-bottom: 30px;
-            color: var(--primary-color);
+            margin-bottom: 40px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
             color: var(--gray-700);
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 15px;
+            padding: 15px 20px;
             border: 2px solid var(--gray-300);
-            border-radius: 6px;
+            border-radius: var(--border-radius);
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: var(--transition);
+            background: white;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* Admin Dashboard */
+        /* Enhanced Admin Dashboard */
         .admin-header {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .admin-header h1 {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--primary-color);
         }
 
         .admin-tabs {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             margin-bottom: 30px;
             background: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow-x: auto;
         }
 
         .admin-tab {
-            padding: 12px 20px;
+            padding: 15px 25px;
             background: transparent;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             color: var(--gray-600);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .admin-tab.active {
-            background-color: var(--primary-color);
+            background: var(--gradient-primary);
             color: white;
+            transform: scale(1.02);
         }
 
         .admin-tab:hover:not(.active) {
-            background-color: var(--gray-200);
+            background: var(--gray-100);
+            transform: translateY(-1px);
         }
 
         .admin-content {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
         }
 
         .tab-content {
@@ -404,83 +690,134 @@
 
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Schedule Forms */
+        /* Enhanced Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Schedule Management */
         .schedule-sub-tabs {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .schedule-sub-tab {
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: var(--gray-200);
             border: none;
-            border-radius: 6px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .schedule-sub-tab.active {
-            background-color: var(--primary-color);
+            background: var(--primary-color);
             color: white;
         }
 
         .schedule-table {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .schedule-table th {
-            background-color: var(--primary-color);
+            background: var(--primary-color);
             color: white;
         }
 
         .schedule-table td {
-            padding: 10px;
+            padding: 15px 12px;
             vertical-align: middle;
         }
 
         .schedule-table select {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid var(--gray-300);
-            border-radius: 4px;
+            border-radius: 6px;
+            background: white;
         }
 
         .schedule-table input[type="checkbox"] {
-            transform: scale(1.2);
+            transform: scale(1.3);
+            cursor: pointer;
         }
 
-        .form-row {
+        /* Charts and Reports */
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .chart-header {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-200);
         }
 
-        .form-row .form-group {
-            flex: 1;
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gray-800);
         }
 
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-export {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        /* Enhanced Mobile Responsiveness */
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 15px;
             }
 
-            .tracking-grid {
-                grid-template-columns: 1fr;
+            .employee-header {
+                padding: 25px 20px;
             }
 
             .employee-header h1 {
                 font-size: 2rem;
             }
 
+            .tracking-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
             .btn--lg {
-                padding: 15px 20px;
+                padding: 20px 25px;
                 font-size: 1.1rem;
-                min-height: 70px;
+                min-height: 75px;
             }
 
             .admin-tabs {
@@ -488,15 +825,67 @@
             }
 
             .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .history-header {
                 flex-direction: column;
+                align-items: stretch;
+            }
+
+            .history-filters {
+                justify-content: center;
             }
 
             .table-container {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
             }
 
             th, td {
-                padding: 10px 8px;
+                padding: 12px 8px;
+            }
+
+            .current-time-display {
+                font-size: 2rem;
+            }
+
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Accessibility Enhancements */
+        .btn:focus {
+            outline: 3px solid rgba(102, 126, 234, 0.3);
+            outline-offset: 2px;
+        }
+
+        .form-control:focus {
+            outline: 3px solid rgba(102, 126, 234, 0.3);
+            outline-offset: 2px;
+        }
+
+        /* Print Styles */
+        @media print {
+            .admin-tabs,
+            .admin-header .btn,
+            .form-actions,
+            .btn {
+                display: none !important;
+            }
+
+            .admin-content {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
+
+        /* Dark mode support (optional) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light-color: #1a202c;
+                --dark-color: #e2e8f0;
             }
         }
     </style>
@@ -505,13 +894,13 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay hidden">
         <div class="loading-spinner"></div>
-        <p>Loading...</p>
+        <p>Loading TimeTracker Pro...</p>
     </div>
 
     <!-- Custom Popup -->
     <div id="popup" class="popup hidden">
         <div class="popup-content">
-            <span class="popup-close">&times;</span>
+            <span class="popup-close"><i class="fas fa-times"></i></span>
             <div class="popup-icon"></div>
             <p class="popup-message"></p>
         </div>
@@ -521,33 +910,59 @@
         <!-- Employee Interface -->
         <div id="employee-view" class="view">
             <div class="employee-header">
-                <h1>Employee Time Tracker</h1>
+                <h1><i class="fas fa-clock"></i> TimeTracker Pro</h1>
                 <div class="employee-id"></div>
+                <div id="current-status" class="status-card clocked-out">
+                    <i class="fas fa-user-clock"></i>
+                    <span>Currently Clocked Out</span>
+                </div>
+                <div class="current-time-display" id="current-time">
+                    00:00:00
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="today-hours">0.00</span>
+                    <div class="stat-label">Today's Hours</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="week-hours">0.00</span>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="last-action">None</span>
+                    <div class="stat-label">Last Action</div>
+                </div>
             </div>
             
             <!-- Time Tracking Buttons -->
-            <div id="time-tracking" class="time-tracking">
+            <div class="time-tracking">
                 <div class="tracking-grid">
-                    <button class="btn btn--primary btn--lg tracking-btn" data-action="Time In">
-                        <span class="btn-icon">🕐</span>
-                        Time In
+                    <button class="btn btn--success btn--lg tracking-btn" data-action="Time In" id="btn-time-in">
+                        <i class="fas fa-play btn-icon"></i>
+                        <span>Clock In</span>
                     </button>
-                    <button class="btn btn--primary btn--lg tracking-btn" data-action="Break Start">
-                        <span class="btn-icon">☕</span>
-                        Break Start
+                    <button class="btn btn--warning btn--lg tracking-btn" data-action="Break Start" id="btn-break-start" disabled>
+                        <i class="fas fa-coffee btn-icon"></i>
+                        <span>Start Break</span>
                     </button>
-                    <button class="btn btn--primary btn--lg tracking-btn" data-action="Break End">
-                        <span class="btn-icon">🔄</span>
-                        Break End
+                    <button class="btn btn--info btn--lg tracking-btn" data-action="Break End" id="btn-break-end" disabled>
+                        <i class="fas fa-play-circle btn-icon"></i>
+                        <span>End Break</span>
                     </button>
-                    <button class="btn btn--primary btn--lg tracking-btn" data-action="Time Out">
-                        <span class="btn-icon">🕐</span>
-                        Time Out
+                    <button class="btn btn--danger btn--lg tracking-btn" data-action="Time Out" id="btn-time-out" disabled>
+                        <i class="fas fa-stop btn-icon"></i>
+                        <span>Clock Out</span>
                     </button>
                 </div>
                 <div style="text-align: center;">
                     <button id="view-history-btn" class="btn btn--secondary">
-                        📊 View My History
+                        <i class="fas fa-history"></i> View My History
+                    </button>
+                    <button id="export-my-data-btn" class="btn btn--secondary">
+                        <i class="fas fa-download"></i> Export Data
                     </button>
                 </div>
             </div>
@@ -556,27 +971,62 @@
         <!-- Employee History View -->
         <div id="history-view" class="view">
             <div class="history-header">
-                <h2>My Time History</h2>
+                <h2><i class="fas fa-history"></i> My Time History</h2>
+                <div class="history-filters">
+                    <div class="filter-group">
+                        <label>From Date</label>
+                        <input type="date" id="filter-from-date" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label>To Date</label>
+                        <input type="date" id="filter-to-date" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button id="apply-date-filter" class="btn btn--primary">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                    </div>
+                </div>
                 <button id="back-to-tracking" class="btn btn--secondary">
-                    ← Back to Time Tracking
+                    <i class="fas fa-arrow-left"></i> Back to Time Tracking
                 </button>
             </div>
+
+            <!-- Daily Summary Charts -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Daily Hours Overview</h3>
+                    <div class="export-buttons">
+                        <button class="btn btn--secondary btn-export" onclick="exportHistoryToCSV()">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                        <button class="btn btn--secondary btn-export" onclick="printHistory()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+                <canvas id="history-chart" width="400" height="150"></canvas>
+            </div>
+
             <div class="history-content">
                 <div class="table-container">
                     <table id="history-table">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Action</th>
-                                <th>Time</th>
-                                <th>Location</th>
+                                <th><i class="fas fa-calendar"></i> Date</th>
+                                <th><i class="fas fa-tasks"></i> Action</th>
+                                <th><i class="fas fa-clock"></i> Time</th>
+                                <th><i class="fas fa-map-marker-alt"></i> Location</th>
+                                <th><i class="fas fa-hourglass-half"></i> Duration</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
                 <div class="total-hours" id="total-hours">
-                    Total Hours Worked: 0.00
+                    <i class="fas fa-calculator"></i>
+                    <span>Total Hours Worked: 0.00</span>
                 </div>
             </div>
         </div>
@@ -584,78 +1034,142 @@
         <!-- Admin Login -->
         <div id="admin-login" class="view">
             <div class="admin-login">
-                <h2>Admin Login</h2>
+                <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
                 <form id="login-form">
                     <div class="form-group">
-                        <label for="admin-password">Password:</label>
-                        <input type="password" id="admin-password" class="form-control" required>
+                        <label for="admin-password"><i class="fas fa-key"></i> Password:</label>
+                        <input type="password" id="admin-password" class="form-control" placeholder="Enter admin password" required>
                     </div>
                     <button type="submit" class="btn btn--primary" style="width: 100%;">
-                        Login
+                        <i class="fas fa-sign-in-alt"></i> Login to Dashboard
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Admin Dashboard -->
+        <!-- Enhanced Admin Dashboard -->
         <div id="admin-dashboard" class="view">
             <div class="admin-header">
-                <h1>Admin Dashboard</h1>
+                <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
                 <button id="admin-logout" class="btn btn--danger">
-                    Logout
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
 
+            <!-- Admin Statistics -->
+            <div class="admin-stats">
+                <div class="admin-stat-card">
+                    <div class="stat-number" id="total-employees">0</div>
+                    <div class="stat-label">Total Employees</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="stat-number" id="active-today">0</div>
+                    <div class="stat-label">Active Today</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="stat-number" id="total-hours-today">0.0</div>
+                    <div class="stat-label">Hours Today</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="stat-number" id="pending-alerts">0</div>
+                    <div class="stat-label">Alerts</div>
+                </div>
+            </div>
+
             <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="employees">Employees</button>
-                <button class="admin-tab" data-tab="schedules">Schedules</button>
-                <button class="admin-tab" data-tab="timelogs">Time Logs</button>
-                <button class="admin-tab" data-tab="alerts">Alerts</button>
-                <button class="admin-tab" data-tab="reports">Reports</button>
+                <button class="admin-tab active" data-tab="employees">
+                    <i class="fas fa-users"></i> Employees
+                </button>
+                <button class="admin-tab" data-tab="schedules">
+                    <i class="fas fa-calendar-alt"></i> Schedules
+                </button>
+                <button class="admin-tab" data-tab="timelogs">
+                    <i class="fas fa-list-alt"></i> Time Logs
+                </button>
+                <button class="admin-tab" data-tab="alerts">
+                    <i class="fas fa-exclamation-triangle"></i> Alerts
+                </button>
+                <button class="admin-tab" data-tab="reports">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </button>
+                <button class="admin-tab" data-tab="analytics">
+                    <i class="fas fa-analytics"></i> Analytics
+                </button>
             </div>
 
             <div class="admin-content">
-                <!-- Employees Tab -->
+                <!-- Enhanced Employees Tab -->
                 <div id="employees-tab" class="tab-content active">
-                    <h3>Employee Management</h3>
+                    <h3><i class="fas fa-user-plus"></i> Employee Management</h3>
                     <form id="add-employee-form">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Employee ID:</label>
+                                <label><i class="fas fa-id-card"></i> Employee ID:</label>
                                 <input type="text" id="emp-id" class="form-control" placeholder="EMP-001" required>
                             </div>
                             <div class="form-group">
-                                <label>First Name:</label>
-                                <input type="text" id="emp-first-name" class="form-control" required>
+                                <label><i class="fas fa-user"></i> First Name:</label>
+                                <input type="text" id="emp-first-name" class="form-control" placeholder="John" required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Last Name:</label>
-                                <input type="text" id="emp-last-name" class="form-control" required>
+                                <label><i class="fas fa-user"></i> Last Name:</label>
+                                <input type="text" id="emp-last-name" class="form-control" placeholder="Doe" required>
                             </div>
                             <div class="form-group">
-                                <label>Phone:</label>
-                                <input type="tel" id="emp-phone" class="form-control" required>
+                                <label><i class="fas fa-phone"></i> Phone:</label>
+                                <input type="tel" id="emp-phone" class="form-control" placeholder="+1 (555) 123-4567" required>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Email:</label>
-                            <input type="email" id="emp-email" class="form-control" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Email:</label>
+                                <input type="email" id="emp-email" class="form-control" placeholder="john.doe@company.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> Department:</label>
+                                <select id="emp-department" class="form-control" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Operations">Operations</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="HR">Human Resources</option>
+                                    <option value="IT">Information Technology</option>
+                                    <option value="Finance">Finance</option>
+                                </select>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn--success">Add Employee</button>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn--success">
+                                <i class="fas fa-plus"></i> Add Employee
+                            </button>
+                            <button type="button" id="bulk-import-btn" class="btn btn--secondary">
+                                <i class="fas fa-upload"></i> Bulk Import
+                            </button>
+                        </div>
                     </form>
 
                     <div style="margin-top: 40px;">
-                        <h4>Current Employees</h4>
-                        <div id="employees-list">
+                        <div class="chart-header">
+                            <h4><i class="fas fa-users"></i> Current Employees</h4>
+                            <div class="export-buttons">
+                                <button class="btn btn--secondary btn-export" onclick="exportEmployeesToCSV()">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
                             <table id="employees-table">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Name</th>
+                                        <th>Department</th>
                                         <th>Phone</th>
                                         <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -664,25 +1178,32 @@
                     </div>
                 </div>
 
-                <!-- Schedules Tab -->
+                <!-- Enhanced Schedules Tab -->
                 <div id="schedules-tab" class="tab-content">
-                    <h3>Schedule Management</h3>
+                    <h3><i class="fas fa-calendar-plus"></i> Schedule Management</h3>
                     <div class="schedule-sub-tabs">
-                        <button class="schedule-sub-tab active" data-subtab="enter">Enter Schedule</button>
-                        <button class="schedule-sub-tab" data-subtab="view">View Schedule</button>
+                        <button class="schedule-sub-tab active" data-subtab="enter">
+                            <i class="fas fa-edit"></i> Enter Schedule
+                        </button>
+                        <button class="schedule-sub-tab" data-subtab="view">
+                            <i class="fas fa-eye"></i> View Schedule
+                        </button>
+                        <button class="schedule-sub-tab" data-subtab="templates">
+                            <i class="fas fa-copy"></i> Templates
+                        </button>
                     </div>
 
                     <div id="enter-schedule" class="schedule-subtab-content">
                         <form id="schedule-form">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Employee:</label>
+                                    <label><i class="fas fa-user"></i> Employee:</label>
                                     <select id="schedule-employee" class="form-control" required>
                                         <option value="">Select Employee</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Week Starting:</label>
+                                    <label><i class="fas fa-calendar"></i> Week Starting:</label>
                                     <input type="date" id="schedule-week" class="form-control" required>
                                 </div>
                             </div>
@@ -693,60 +1214,73 @@
                                         <th>Day</th>
                                         <th>Start Time</th>
                                         <th>End Time</th>
+                                        <th>Break Duration</th>
                                         <th>Not Working</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr data-day="monday">
-                                        <td><strong>Monday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Monday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                     <tr data-day="tuesday">
-                                        <td><strong>Tuesday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Tuesday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                     <tr data-day="wednesday">
-                                        <td><strong>Wednesday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Wednesday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                     <tr data-day="thursday">
-                                        <td><strong>Thursday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Thursday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                     <tr data-day="friday">
-                                        <td><strong>Friday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Friday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                     <tr data-day="saturday">
-                                        <td><strong>Saturday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Saturday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                     <tr data-day="sunday">
-                                        <td><strong>Sunday</strong></td>
-                                        <td><select class="start-time"></select></td>
-                                        <td><select class="end-time"></select></td>
+                                        <td><strong><i class="fas fa-calendar-day"></i> Sunday</strong></td>
+                                        <td><select class="start-time form-control"></select></td>
+                                        <td><select class="end-time form-control"></select></td>
+                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
                                         <td><input type="checkbox" class="not-working"></td>
                                     </tr>
                                 </tbody>
                             </table>
 
-                            <div style="margin-top: 20px;">
+                            <div class="form-actions">
                                 <button type="button" id="copy-schedule" class="btn btn--secondary">
-                                    Copy to All Working Days
+                                    <i class="fas fa-copy"></i> Copy Monday to All Working Days
                                 </button>
-                                <button type="submit" class="btn btn--success">Save Schedule</button>
+                                <button type="button" id="save-template" class="btn btn--info">
+                                    <i class="fas fa-save"></i> Save as Template
+                                </button>
+                                <button type="submit" class="btn btn--success">
+                                    <i class="fas fa-check"></i> Save Schedule
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -754,26 +1288,71 @@
                     <div id="view-schedule" class="schedule-subtab-content" style="display: none;">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Employee:</label>
+                                <label><i class="fas fa-user"></i> Employee:</label>
                                 <select id="view-schedule-employee" class="form-control">
                                     <option value="">Select Employee</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Week Starting:</label>
+                                <label><i class="fas fa-calendar"></i> Week Starting:</label>
                                 <input type="date" id="view-schedule-week" class="form-control">
                             </div>
                             <div class="form-group">
-                                <button id="load-schedule" class="btn btn--primary">Load Schedule</button>
+                                <label>&nbsp;</label>
+                                <button id="load-schedule" class="btn btn--primary">
+                                    <i class="fas fa-search"></i> Load Schedule
+                                </button>
                             </div>
                         </div>
                         <div id="schedule-display"></div>
                     </div>
+
+                    <div id="templates-schedule" class="schedule-subtab-content" style="display: none;">
+                        <h4><i class="fas fa-layer-group"></i> Schedule Templates</h4>
+                        <div id="schedule-templates">
+                            <!-- Templates will be loaded here -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Time Logs Tab -->
+                <!-- Enhanced Time Logs Tab -->
                 <div id="timelogs-tab" class="tab-content">
-                    <h3>Time Logs</h3>
+                    <div class="chart-header">
+                        <h3><i class="fas fa-list-alt"></i> Time Logs</h3>
+                        <div class="export-buttons">
+                            <button class="btn btn--secondary btn-export" onclick="exportTimeLogsToCSV()">
+                                <i class="fas fa-file-csv"></i> Export CSV
+                            </button>
+                            <button class="btn btn--info btn-export" onclick="refreshTimeLogs()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Real-time filters -->
+                    <div class="form-row" style="margin-bottom: 25px;">
+                        <div class="form-group">
+                            <label><i class="fas fa-filter"></i> Filter by Employee:</label>
+                            <select id="logs-employee-filter" class="form-control">
+                                <option value="">All Employees</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Date Range:</label>
+                            <input type="date" id="logs-date-from" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <input type="date" id="logs-date-to" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button id="apply-logs-filter" class="btn btn--primary">
+                                <i class="fas fa-search"></i> Apply Filter
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="table-container">
                         <table id="timelogs-table">
                             <thead>
@@ -782,6 +1361,7 @@
                                     <th>Action</th>
                                     <th>Timestamp</th>
                                     <th>Location</th>
+                                    <th>Session Duration</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -789,17 +1369,29 @@
                     </div>
                 </div>
 
-                <!-- Alerts Tab -->
+                <!-- Enhanced Alerts Tab -->
                 <div id="alerts-tab" class="tab-content">
-                    <h3>Alerts</h3>
+                    <div class="chart-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> System Alerts</h3>
+                        <div class="export-buttons">
+                            <button class="btn btn--warning btn-export" onclick="markAllAlertsRead()">
+                                <i class="fas fa-check-double"></i> Mark All Read
+                            </button>
+                            <button class="btn btn--danger btn-export" onclick="clearOldAlerts()">
+                                <i class="fas fa-trash"></i> Clear Old Alerts
+                            </button>
+                        </div>
+                    </div>
                     <div class="table-container">
                         <table id="alerts-table">
                             <thead>
                                 <tr>
+                                    <th>Priority</th>
                                     <th>Employee ID</th>
                                     <th>Alert Type</th>
                                     <th>Message</th>
                                     <th>Timestamp</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -807,19 +1399,72 @@
                     </div>
                 </div>
 
-                <!-- Reports Tab -->
+                <!-- Enhanced Reports Tab -->
                 <div id="reports-tab" class="tab-content">
-                    <h3>Weekly Reports</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Advanced Reports</h3>
+                    
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Week Starting:</label>
+                            <label><i class="fas fa-calendar"></i> Report Type:</label>
+                            <select id="report-type" class="form-control">
+                                <option value="weekly">Weekly Report</option>
+                                <option value="monthly">Monthly Report</option>
+                                <option value="custom">Custom Date Range</option>
+                                <option value="employee">Individual Employee</option>
+                                <option value="department">Department Summary</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-week"></i> Week/Period Starting:</label>
                             <input type="date" id="report-week" class="form-control">
                         </div>
                         <div class="form-group">
-                            <button id="generate-report" class="btn btn--primary">Generate Report</button>
+                            <label>&nbsp;</label>
+                            <button id="generate-report" class="btn btn--success">
+                                <i class="fas fa-chart-line"></i> Generate Report
+                            </button>
                         </div>
                     </div>
-                    <div id="report-content"></div>
+                    
+                    <div id="report-content">
+                        <!-- Reports will be generated here -->
+                    </div>
+                </div>
+
+                <!-- New Analytics Tab -->
+                <div id="analytics-tab" class="tab-content">
+                    <h3><i class="fas fa-analytics"></i> Analytics Dashboard</h3>
+                    
+                    <!-- Analytics Charts -->
+                    <div class="form-row">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h4>Daily Hours Trend</h4>
+                            </div>
+                            <canvas id="daily-hours-chart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h4>Department Hours Distribution</h4>
+                            </div>
+                            <canvas id="department-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h4>Employee Attendance Rate</h4>
+                            </div>
+                            <canvas id="attendance-chart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h4>Peak Hours Activity</h4>
+                            </div>
+                            <canvas id="peak-hours-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -827,16 +1472,15 @@
 
     <script>
         // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAU3O5YraVh_rdWr6PQx8SUOYL4wEHLC_w",
-  authDomain: "employeetimetracker-9f22d.firebaseapp.com",
-  projectId: "employeetimetracker-9f22d",
-  storageBucket: "employeetimetracker-9f22d.firebasestorage.app",
-  messagingSenderId: "784746042067",
-  appId: "1:784746042067:web:0a6a27342af98be7bdba26",
-  measurementId: "G-WNJYX2FVXN"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAU3O5YraVh_rdWr6PQx8SUOYL4wEHLC_w",
+            authDomain: "employeetimetracker-9f22d.firebaseapp.com",
+            projectId: "employeetimetracker-9f22d",
+            storageBucket: "employeetimetracker-9f22d.firebasestorage.app",
+            messagingSenderId: "784746042067",
+            appId: "1:784746042067:web:0a6a27342af98be7bdba26",
+            measurementId: "G-WNJYX2FVXN"
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -848,6 +1492,9 @@ const firebaseConfig = {
         let currentUser = null;
         let isAdmin = false;
         let realTimeListeners = [];
+        let currentEmployeeStatus = 'clocked-out'; // 'clocked-in', 'on-break', 'clocked-out'
+        let currentTimeInterval = null;
+        let historyChart = null;
 
         // Time slots for schedule dropdowns (15-minute increments)
         const timeSlots = [
@@ -864,7 +1511,7 @@ const firebaseConfig = {
 
         const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-        // Utility Functions
+        // Enhanced Utility Functions
         function showLoading(show = true) {
             const overlay = document.getElementById('loading-overlay');
             if (show) {
@@ -874,7 +1521,7 @@ const firebaseConfig = {
             }
         }
 
-        function showPopup(message, type = 'info', duration = 3000) {
+        function showPopup(message, type = 'info', duration = 4000) {
             const popup = document.getElementById('popup');
             const messageElement = popup.querySelector('.popup-message');
             
@@ -897,7 +1544,34 @@ const firebaseConfig = {
             document.getElementById(viewId).classList.add('active');
         }
 
-        // Geolocation functions
+        // Enhanced Time Display
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const timeDisplay = document.getElementById('current-time');
+            if (timeDisplay) {
+                timeDisplay.textContent = timeString;
+            }
+        }
+
+        function startTimeDisplay() {
+            updateCurrentTime();
+            currentTimeInterval = setInterval(updateCurrentTime, 1000);
+        }
+
+        function stopTimeDisplay() {
+            if (currentTimeInterval) {
+                clearInterval(currentTimeInterval);
+                currentTimeInterval = null;
+            }
+        }
+
+        // Enhanced Geolocation
         function getCurrentLocation() {
             return new Promise((resolve, reject) => {
                 if (!navigator.geolocation) {
@@ -909,7 +1583,9 @@ const firebaseConfig = {
                     (position) => {
                         resolve({
                             lat: position.coords.latitude,
-                            lng: position.coords.longitude
+                            lng: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: new Date().toISOString()
                         });
                     },
                     (error) => {
@@ -917,8 +1593,8 @@ const firebaseConfig = {
                     },
                     {
                         enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 60000
+                        timeout: 15000,
+                        maximumAge: 300000
                     }
                 );
             });
@@ -933,10 +1609,115 @@ const firebaseConfig = {
             if (!location || !location.lat || !location.lng) return 'Unknown';
             const coords = formatLocation(location);
             const googleMapsUrl = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
-            return `<a href="${googleMapsUrl}" target="_blank" class="location-link">${coords}</a>`;
+            return `<a href="${googleMapsUrl}" target="_blank" class="location-link"><i class="fas fa-map-marker-alt"></i> ${coords}</a>`;
         }
 
-        // Time calculation functions
+        // Enhanced Employee Status Management
+        async function updateEmployeeStatus() {
+            if (!currentEmployeeId) return;
+
+            try {
+                // Get the last action for this employee
+                const snapshot = await db.collection('timeLogs')
+                    .where('employeeId', '==', currentEmployeeId)
+                    .orderBy('timestamp', 'desc')
+                    .limit(1)
+                    .get();
+
+                if (!snapshot.empty) {
+                    const lastLog = snapshot.docs[0].data();
+                    const lastAction = lastLog.action;
+                    
+                    // Update status based on last action
+                    switch (lastAction) {
+                        case 'Time In':
+                            currentEmployeeStatus = 'clocked-in';
+                            break;
+                        case 'Break Start':
+                            currentEmployeeStatus = 'on-break';
+                            break;
+                        case 'Break End':
+                            currentEmployeeStatus = 'clocked-in';
+                            break;
+                        case 'Time Out':
+                            currentEmployeeStatus = 'clocked-out';
+                            break;
+                    }
+                    
+                    document.getElementById('last-action').textContent = lastAction;
+                } else {
+                    currentEmployeeStatus = 'clocked-out';
+                    document.getElementById('last-action').textContent = 'None';
+                }
+
+                updateButtonStates();
+                updateStatusDisplay();
+                
+            } catch (error) {
+                console.error('Error updating employee status:', error);
+            }
+        }
+
+        function updateButtonStates() {
+            const timeInBtn = document.getElementById('btn-time-in');
+            const breakStartBtn = document.getElementById('btn-break-start');
+            const breakEndBtn = document.getElementById('btn-break-end');
+            const timeOutBtn = document.getElementById('btn-time-out');
+
+            // Reset all buttons
+            [timeInBtn, breakStartBtn, breakEndBtn, timeOutBtn].forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('btn--success', 'btn--warning', 'btn--info', 'btn--danger');
+            });
+
+            switch (currentEmployeeStatus) {
+                case 'clocked-out':
+                    timeInBtn.classList.add('btn--success');
+                    breakStartBtn.disabled = true;
+                    breakEndBtn.disabled = true;
+                    timeOutBtn.disabled = true;
+                    break;
+                case 'clocked-in':
+                    timeInBtn.disabled = true;
+                    breakStartBtn.classList.add('btn--warning');
+                    breakEndBtn.disabled = true;
+                    timeOutBtn.classList.add('btn--danger');
+                    break;
+                case 'on-break':
+                    timeInBtn.disabled = true;
+                    breakStartBtn.disabled = true;
+                    breakEndBtn.classList.add('btn--info');
+                    timeOutBtn.classList.add('btn--danger');
+                    break;
+            }
+        }
+
+        function updateStatusDisplay() {
+            const statusCard = document.getElementById('current-status');
+            const statusText = statusCard.querySelector('span');
+            const statusIcon = statusCard.querySelector('i');
+
+            switch (currentEmployeeStatus) {
+                case 'clocked-in':
+                    statusCard.className = 'status-card';
+                    statusIcon.className = 'fas fa-clock';
+                    statusText.textContent = 'Currently Clocked In';
+                    break;
+                case 'on-break':
+                    statusCard.className = 'status-card';
+                    statusCard.style.background = 'var(--gradient-secondary)';
+                    statusIcon.className = 'fas fa-coffee';
+                    statusText.textContent = 'Currently On Break';
+                    break;
+                case 'clocked-out':
+                    statusCard.className = 'status-card clocked-out';
+                    statusIcon.className = 'fas fa-user-clock';
+                    statusText.textContent = 'Currently Clocked Out';
+                    break;
+            }
+        }
+
+        // Enhanced Time Calculation
         function calculateWorkHours(logs) {
             let totalMinutes = 0;
             let currentSession = null;
@@ -986,70 +1767,133 @@ const firebaseConfig = {
             return roundedMinutes / 60; // Return hours
         }
 
-        // Time tracking functions
+        // Enhanced Time Tracking
         async function logTimeAction(action) {
-    try {
-        showLoading(true);
-        
-        // Enhanced mobile authentication
-        if (!currentUser) {
-            console.log('No user found, attempting to sign in anonymously...');
-            await auth.signInAnonymously();
-            
-            // Wait for auth state to update
-            await new Promise((resolve) => {
-                const unsubscribe = auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        currentUser = user;
-                        unsubscribe();
-                        resolve();
-                    }
+            try {
+                showLoading(true);
+                
+                // Enhanced mobile authentication
+                if (!currentUser) {
+                    console.log('No user found, attempting to sign in anonymously...');
+                    await auth.signInAnonymously();
+                    
+                    // Wait for auth state to update
+                    await new Promise((resolve) => {
+                        const unsubscribe = auth.onAuthStateChanged((user) => {
+                            if (user) {
+                                currentUser = user;
+                                unsubscribe();
+                                resolve();
+                            }
+                        });
+                    });
+                }
+                
+                // Verify we have a user
+                if (!currentUser) {
+                    throw new Error('Authentication failed - please refresh the page');
+                }
+                
+                const location = await getCurrentLocation();
+                
+                await db.collection('timeLogs').add({
+                    employeeId: currentEmployeeId,
+                    action: action,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    location: location,
+                    userId: currentUser.uid
                 });
-            });
-        }
-        
-        // Verify we have a user
-        if (!currentUser) {
-            throw new Error('Authentication failed - please refresh the page');
-        }
-        
-        console.log('User authenticated:', currentUser.uid);
-        
-        const location = await getCurrentLocation();
-        
-        await db.collection('timeLogs').add({
-            employeeId: currentEmployeeId,
-            action: action,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            location: location
-        });
 
-        showPopup(`${action} logged successfully!`, 'success');
-        
-    } catch (error) {
-        console.error('Error logging time action:', error);
-        if (error.code === 1) { // Geolocation permission denied
-            showPopup('Please enable location access to log time entries.', 'error');
-        } else if (error.message.includes('permission') || error.message.includes('insufficient')) {
-            showPopup('Authentication error - please refresh the page and try again.', 'error');
-        } else {
-            showPopup(`Error logging ${action}: ${error.message}`, 'error');
+                showPopup(`${action} logged successfully!`, 'success');
+                
+                // Update employee status and refresh data
+                await updateEmployeeStatus();
+                await updateQuickStats();
+                
+            } catch (error) {
+                console.error('Error logging time action:', error);
+                if (error.code === 1) { // Geolocation permission denied
+                    showPopup('Please enable location access to log time entries.', 'error');
+                } else if (error.message.includes('permission') || error.message.includes('insufficient')) {
+                    showPopup('Authentication error - please refresh the page and try again.', 'error');
+                } else {
+                    showPopup(`Error logging ${action}: ${error.message}`, 'error');
+                }
+            } finally {
+                showLoading(false);
+            }
         }
-    } finally {
-        showLoading(false);
-    }
-}
 
+        // Enhanced Quick Stats
+        async function updateQuickStats() {
+            if (!currentEmployeeId) return;
 
-        // Employee history functions
+            try {
+                const today = new Date();
+                const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                const todayEnd = new Date(todayStart);
+                todayEnd.setDate(todayEnd.getDate() + 1);
+
+                // Get this week's start (Monday)
+                const weekStart = new Date(today);
+                const dayOfWeek = weekStart.getDay() || 7; // Sunday = 7
+                weekStart.setDate(weekStart.getDate() - dayOfWeek + 1);
+                weekStart.setHours(0, 0, 0, 0);
+
+                // Today's logs
+                const todaySnapshot = await db.collection('timeLogs')
+                    .where('employeeId', '==', currentEmployeeId)
+                    .where('timestamp', '>=', todayStart)
+                    .where('timestamp', '<', todayEnd)
+                    .get();
+
+                // Week's logs
+                const weekSnapshot = await db.collection('timeLogs')
+                    .where('employeeId', '==', currentEmployeeId)
+                    .where('timestamp', '>=', weekStart)
+                    .get();
+
+                const todayLogs = [];
+                todaySnapshot.forEach(doc => todayLogs.push(doc.data()));
+
+                const weekLogs = [];
+                weekSnapshot.forEach(doc => weekLogs.push(doc.data()));
+
+                const todayHours = calculateWorkHours(todayLogs);
+                const weekHours = calculateWorkHours(weekLogs);
+
+                document.getElementById('today-hours').textContent = todayHours.toFixed(2);
+                document.getElementById('week-hours').textContent = weekHours.toFixed(2);
+
+            } catch (error) {
+                console.error('Error updating quick stats:', error);
+            }
+        }
+
+        // Enhanced Employee History
         async function loadEmployeeHistory() {
             try {
                 showLoading(true);
                 
-                const snapshot = await db.collection('timeLogs')
+                const fromDate = document.getElementById('filter-from-date')?.value;
+                const toDate = document.getElementById('filter-to-date')?.value;
+                
+                let query = db.collection('timeLogs')
                     .where('employeeId', '==', currentEmployeeId)
-                    .orderBy('timestamp', 'desc')
-                    .get();
+                    .orderBy('timestamp', 'desc');
+
+                if (fromDate) {
+                    const startDate = new Date(fromDate);
+                    query = query.where('timestamp', '>=', startDate);
+                }
+
+                if (toDate) {
+                    const endDate = new Date(toDate);
+                    endDate.setDate(endDate.getDate() + 1);
+                    query = query.where('timestamp', '<=', endDate);
+                }
+
+                const snapshot = await query.get();
 
                 const tbody = document.querySelector('#history-table tbody');
                 tbody.innerHTML = '';
@@ -1064,16 +1908,25 @@ const firebaseConfig = {
                     
                     row.innerHTML = `
                         <td>${timestamp.toLocaleDateString()}</td>
-                        <td>${data.action}</td>
+                        <td><span class="action-badge action-${data.action.replace(/\s+/g, '-').toLowerCase()}">${data.action}</span></td>
                         <td>${timestamp.toLocaleTimeString()}</td>
                         <td>${createLocationLink(data.location)}</td>
+                        <td class="duration-cell" data-timestamp="${timestamp.getTime()}">Calculating...</td>
                     `;
                 });
 
+                // Calculate durations
+                calculateSessionDurations(logs);
+
                 // Calculate total hours
                 const totalHours = calculateWorkHours(logs);
-                document.getElementById('total-hours').textContent = 
-                    `Total Hours Worked: ${totalHours.toFixed(2)}`;
+                document.getElementById('total-hours').innerHTML = `
+                    <i class="fas fa-calculator"></i>
+                    <span>Total Hours Worked: ${totalHours.toFixed(2)}</span>
+                `;
+
+                // Update history chart
+                updateHistoryChart(logs);
 
             } catch (error) {
                 console.error('Error loading history:', error);
@@ -1083,7 +1936,101 @@ const firebaseConfig = {
             }
         }
 
-        // Admin functions
+        function calculateSessionDurations(logs) {
+            // Calculate duration for each session
+            logs.sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate());
+            
+            for (let i = 0; i < logs.length - 1; i++) {
+                const currentLog = logs[i];
+                const nextLog = logs[i + 1];
+                
+                const currentTime = currentLog.timestamp.toDate();
+                const nextTime = nextLog.timestamp.toDate();
+                
+                const duration = (nextTime - currentTime) / (1000 * 60); // Minutes
+                
+                const durationCell = document.querySelector(`[data-timestamp="${currentTime.getTime()}"]`);
+                if (durationCell) {
+                    if (duration > 0) {
+                        const hours = Math.floor(duration / 60);
+                        const minutes = Math.floor(duration % 60);
+                        durationCell.textContent = `${hours}h ${minutes}m`;
+                    } else {
+                        durationCell.textContent = '-';
+                    }
+                }
+            }
+            
+            // Last entry has no duration
+            const lastLog = logs[logs.length - 1];
+            if (lastLog) {
+                const lastTime = lastLog.timestamp.toDate();
+                const lastDurationCell = document.querySelector(`[data-timestamp="${lastTime.getTime()}"]`);
+                if (lastDurationCell) {
+                    lastDurationCell.textContent = '-';
+                }
+            }
+        }
+
+        function updateHistoryChart(logs) {
+            const ctx = document.getElementById('history-chart');
+            if (!ctx) return;
+
+            // Group logs by date
+            const dailyHours = {};
+            logs.forEach(log => {
+                const date = log.timestamp.toDate().toDateString();
+                if (!dailyHours[date]) {
+                    dailyHours[date] = [];
+                }
+                dailyHours[date].push(log);
+            });
+
+            // Calculate hours per day
+            const dates = Object.keys(dailyHours).sort((a, b) => new Date(a) - new Date(b)).slice(-7); // Last 7 days
+            const hours = dates.map(date => calculateWorkHours(dailyHours[date]));
+
+            if (historyChart) {
+                historyChart.destroy();
+            }
+
+            historyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+                    datasets: [{
+                        label: 'Hours Worked',
+                        data: hours,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 12,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'h';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Enhanced Admin Functions
         async function authenticateAdmin(password) {
             if (password === 'admin123') {
                 await auth.signInAnonymously();
@@ -1096,10 +2043,69 @@ const firebaseConfig = {
         }
 
         async function loadAdminData() {
-            await loadEmployeesList();
-            await loadTimeLogsTable();
-            await loadAlertsTable();
-            await populateEmployeeDropdowns();
+            await Promise.all([
+                loadEmployeesList(),
+                loadTimeLogsTable(),
+                loadAlertsTable(),
+                populateEmployeeDropdowns(),
+                updateAdminStats()
+            ]);
+        }
+
+        async function updateAdminStats() {
+            try {
+                // Total employees
+                const employeesSnapshot = await db.collection('employees').get();
+                document.getElementById('total-employees').textContent = employeesSnapshot.size;
+
+                // Active today (employees who clocked in today)
+                const today = new Date();
+                const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                const todayEnd = new Date(todayStart);
+                todayEnd.setDate(todayEnd.getDate() + 1);
+
+                const todayLogsSnapshot = await db.collection('timeLogs')
+                    .where('timestamp', '>=', todayStart)
+                    .where('timestamp', '<', todayEnd)
+                    .where('action', '==', 'Time In')
+                    .get();
+
+                const activeEmployees = new Set();
+                todayLogsSnapshot.forEach(doc => {
+                    activeEmployees.add(doc.data().employeeId);
+                });
+                document.getElementById('active-today').textContent = activeEmployees.size;
+
+                // Total hours today
+                const allTodayLogsSnapshot = await db.collection('timeLogs')
+                    .where('timestamp', '>=', todayStart)
+                    .where('timestamp', '<', todayEnd)
+                    .get();
+
+                const employeeLogs = {};
+                allTodayLogsSnapshot.forEach(doc => {
+                    const log = doc.data();
+                    if (!employeeLogs[log.employeeId]) {
+                        employeeLogs[log.employeeId] = [];
+                    }
+                    employeeLogs[log.employeeId].push(log);
+                });
+
+                let totalHoursToday = 0;
+                Object.values(employeeLogs).forEach(logs => {
+                    totalHoursToday += calculateWorkHours(logs);
+                });
+                document.getElementById('total-hours-today').textContent = totalHoursToday.toFixed(1);
+
+                // Pending alerts
+                const alertsSnapshot = await db.collection('alerts')
+                    .where('status', '==', 'unread')
+                    .get();
+                document.getElementById('pending-alerts').textContent = alertsSnapshot.size;
+
+            } catch (error) {
+                console.error('Error updating admin stats:', error);
+            }
         }
 
         async function loadEmployeesList() {
@@ -1112,10 +2118,20 @@ const firebaseConfig = {
                     const employee = doc.data();
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td>${employee.id}</td>
+                        <td><strong>${employee.id}</strong></td>
                         <td>${employee.firstName} ${employee.lastName}</td>
+                        <td><span class="dept-badge">${employee.department || 'Unassigned'}</span></td>
                         <td>${employee.phone}</td>
                         <td>${employee.email}</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td>
+                            <button class="btn btn--secondary btn-export" onclick="editEmployee('${employee.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn--danger btn-export" onclick="deleteEmployee('${employee.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
                     `;
                 });
             } catch (error) {
@@ -1139,10 +2155,11 @@ const firebaseConfig = {
                     const timestamp = log.timestamp ? log.timestamp.toDate() : new Date();
                     
                     row.innerHTML = `
-                        <td>${log.employeeId}</td>
-                        <td>${log.action}</td>
+                        <td><strong>${log.employeeId}</strong></td>
+                        <td><span class="action-badge action-${log.action.replace(/\s+/g, '-').toLowerCase()}">${log.action}</span></td>
                         <td>${timestamp.toLocaleString()}</td>
                         <td>${createLocationLink(log.location)}</td>
+                        <td class="session-duration">-</td>
                     `;
                 });
             } catch (error) {
@@ -1166,10 +2183,12 @@ const firebaseConfig = {
                     const timestamp = alert.timestamp ? alert.timestamp.toDate() : new Date();
                     
                     row.innerHTML = `
-                        <td>${alert.employeeId}</td>
+                        <td><span class="priority-badge priority-${alert.priority || 'medium'}">${alert.priority || 'Medium'}</span></td>
+                        <td><strong>${alert.employeeId}</strong></td>
                         <td>${alert.type}</td>
                         <td>${alert.message}</td>
                         <td>${timestamp.toLocaleString()}</td>
+                        <td><span class="status-badge ${alert.status || 'unread'}">${alert.status || 'Unread'}</span></td>
                     `;
                 });
             } catch (error) {
@@ -1183,10 +2202,13 @@ const firebaseConfig = {
                 
                 const dropdowns = [
                     document.getElementById('schedule-employee'),
-                    document.getElementById('view-schedule-employee')
+                    document.getElementById('view-schedule-employee'),
+                    document.getElementById('logs-employee-filter')
                 ];
 
                 dropdowns.forEach(dropdown => {
+                    if (!dropdown) return;
+                    
                     // Clear existing options except the first one
                     while (dropdown.children.length > 1) {
                         dropdown.removeChild(dropdown.lastChild);
@@ -1205,7 +2227,73 @@ const firebaseConfig = {
             }
         }
 
-        // Schedule functions
+        // Export Functions
+        function exportHistoryToCSV() {
+            const table = document.getElementById('history-table');
+            let csv = 'Date,Action,Time,Location,Duration\n';
+            
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = [];
+                for (let j = 0; j < row.cells.length; j++) {
+                    rowData.push('"' + row.cells[j].textContent.replace(/"/g, '""') + '"');
+                }
+                csv += rowData.join(',') + '\n';
+            }
+            
+            downloadCSV(csv, `employee-${currentEmployeeId}-history.csv`);
+        }
+
+        function exportEmployeesToCSV() {
+            const table = document.getElementById('employees-table');
+            let csv = 'ID,Name,Department,Phone,Email,Status\n';
+            
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = [];
+                for (let j = 0; j < row.cells.length - 1; j++) { // Exclude actions column
+                    rowData.push('"' + row.cells[j].textContent.replace(/"/g, '""') + '"');
+                }
+                csv += rowData.join(',') + '\n';
+            }
+            
+            downloadCSV(csv, 'employees-list.csv');
+        }
+
+        function exportTimeLogsToCSV() {
+            const table = document.getElementById('timelogs-table');
+            let csv = 'Employee ID,Action,Timestamp,Location,Duration\n';
+            
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = [];
+                for (let j = 0; j < row.cells.length; j++) {
+                    rowData.push('"' + row.cells[j].textContent.replace(/"/g, '""') + '"');
+                }
+                csv += rowData.join(',') + '\n';
+            }
+            
+            downloadCSV(csv, 'time-logs.csv');
+        }
+
+        function downloadCSV(csvContent, fileName) {
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', fileName);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function printHistory() {
+            window.print();
+        }
+
+        // Schedule Functions
         function populateTimeDropdowns() {
             const startSelects = document.querySelectorAll('.start-time');
             const endSelects = document.querySelectorAll('.end-time');
@@ -1241,38 +2329,43 @@ const firebaseConfig = {
             }
         }
 
-        // Initialization
-async function initializeApp() {
-    try {
-        // Force anonymous authentication on app start
-        if (!auth.currentUser) {
-            console.log('Signing in anonymously...');
-            await auth.signInAnonymously();
+        // Enhanced Initialization
+        async function initializeApp() {
+            try {
+                // Force anonymous authentication on app start
+                if (!auth.currentUser) {
+                    console.log('Signing in anonymously...');
+                    await auth.signInAnonymously();
+                }
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const employeeId = urlParams.get('id');
+
+                if (employeeId) {
+                    // Employee interface
+                    currentEmployeeId = employeeId;
+                    document.querySelector('.employee-id').textContent = `Employee ID: ${employeeId}`;
+                    showView('employee-view');
+                    
+                    // Start time display and update status
+                    startTimeDisplay();
+                    await updateEmployeeStatus();
+                    await updateQuickStats();
+                } else {
+                    // Admin login
+                    showView('admin-login');
+                }
+
+                populateTimeDropdowns();
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showPopup('App initialization failed - please refresh the page', 'error');
+            }
         }
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const employeeId = urlParams.get('id');
 
-        if (employeeId) {
-            // Employee interface
-            currentEmployeeId = employeeId;
-            document.querySelector('.employee-id').textContent = `Employee ID: ${employeeId}`;
-            showView('employee-view');
-        } else {
-            // Admin login
-            showView('admin-login');
-        }
-
-        populateTimeDropdowns();
-        setupEventListeners();
-        
-    } catch (error) {
-        console.error('Initialization error:', error);
-        showPopup('App initialization failed - please refresh the page', 'error');
-    }
-}
-
-
+        // Enhanced Event Listeners Setup
         function setupEventListeners() {
             // Time tracking buttons
             document.querySelectorAll('.tracking-btn').forEach(btn => {
@@ -1283,34 +2376,42 @@ async function initializeApp() {
             });
 
             // View history button
-            document.getElementById('view-history-btn').addEventListener('click', () => {
+            document.getElementById('view-history-btn')?.addEventListener('click', () => {
                 showView('history-view');
                 loadEmployeeHistory();
             });
 
             // Back to tracking button
-            document.getElementById('back-to-tracking').addEventListener('click', () => {
+            document.getElementById('back-to-tracking')?.addEventListener('click', () => {
                 showView('employee-view');
+                stopTimeDisplay();
+                startTimeDisplay();
+            });
+
+            // Date filters
+            document.getElementById('apply-date-filter')?.addEventListener('click', () => {
+                loadEmployeeHistory();
             });
 
             // Admin login form
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
+            document.getElementById('login-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const password = document.getElementById('admin-password').value;
                 
                 if (await authenticateAdmin(password)) {
-                    showPopup('Login successful!', 'success');
+                    showPopup('Login successful! Welcome to the admin dashboard.', 'success');
                 } else {
-                    showPopup('Invalid password!', 'error');
+                    showPopup('Invalid password! Please try again.', 'error');
                 }
             });
 
             // Admin logout
-            document.getElementById('admin-logout').addEventListener('click', () => {
+            document.getElementById('admin-logout')?.addEventListener('click', () => {
                 isAdmin = false;
                 auth.signOut();
                 showView('admin-login');
                 document.getElementById('admin-password').value = '';
+                showPopup('Successfully logged out.', 'info');
             });
 
             // Admin tabs
@@ -1344,7 +2445,7 @@ async function initializeApp() {
             });
 
             // Add employee form
-            document.getElementById('add-employee-form').addEventListener('submit', async (e) => {
+            document.getElementById('add-employee-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const employeeData = {
@@ -1352,7 +2453,10 @@ async function initializeApp() {
                     firstName: document.getElementById('emp-first-name').value,
                     lastName: document.getElementById('emp-last-name').value,
                     phone: document.getElementById('emp-phone').value,
-                    email: document.getElementById('emp-email').value
+                    email: document.getElementById('emp-email').value,
+                    department: document.getElementById('emp-department').value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
                 };
 
                 try {
@@ -1361,13 +2465,14 @@ async function initializeApp() {
                     e.target.reset();
                     await loadEmployeesList();
                     await populateEmployeeDropdowns();
+                    await updateAdminStats();
                 } catch (error) {
                     showPopup('Error adding employee: ' + error.message, 'error');
                 }
             });
 
             // Schedule form
-            document.getElementById('schedule-form').addEventListener('submit', async (e) => {
+            document.getElementById('schedule-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const employeeId = document.getElementById('schedule-employee').value;
@@ -1376,7 +2481,8 @@ async function initializeApp() {
                 const scheduleData = {
                     employeeId: employeeId,
                     weekStart: weekStart,
-                    schedule: {}
+                    schedule: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 // Collect schedule data for each day
@@ -1384,11 +2490,13 @@ async function initializeApp() {
                     const row = document.querySelector(`tr[data-day="${day}"]`);
                     const startTime = row.querySelector('.start-time').value;
                     const endTime = row.querySelector('.end-time').value;
+                    const breakDuration = row.querySelector('.break-duration').value || 0;
                     const notWorking = row.querySelector('.not-working').checked;
                     
                     scheduleData.schedule[day] = {
                         start: startTime,
                         end: endTime,
+                        breakDuration: parseInt(breakDuration),
                         notWorking: notWorking
                     };
                 });
@@ -1397,10 +2505,11 @@ async function initializeApp() {
             });
 
             // Copy schedule to all working days
-            document.getElementById('copy-schedule').addEventListener('click', () => {
+            document.getElementById('copy-schedule')?.addEventListener('click', () => {
                 const mondayRow = document.querySelector('tr[data-day="monday"]');
                 const mondayStart = mondayRow.querySelector('.start-time').value;
                 const mondayEnd = mondayRow.querySelector('.end-time').value;
+                const mondayBreak = mondayRow.querySelector('.break-duration').value;
                 
                 if (!mondayStart || !mondayEnd) {
                     showPopup('Please set Monday\'s schedule first', 'error');
@@ -1414,6 +2523,7 @@ async function initializeApp() {
                     if (!notWorking) {
                         row.querySelector('.start-time').value = mondayStart;
                         row.querySelector('.end-time').value = mondayEnd;
+                        row.querySelector('.break-duration').value = mondayBreak;
                     }
                 });
 
@@ -1421,7 +2531,7 @@ async function initializeApp() {
             });
 
             // Load schedule button
-            document.getElementById('load-schedule').addEventListener('click', async () => {
+            document.getElementById('load-schedule')?.addEventListener('click', async () => {
                 const employeeId = document.getElementById('view-schedule-employee').value;
                 const weekStart = document.getElementById('view-schedule-week').value;
                 
@@ -1434,42 +2544,46 @@ async function initializeApp() {
                 const displayDiv = document.getElementById('schedule-display');
                 
                 if (schedule) {
-                    let html = '<table class="schedule-table"><thead><tr><th>Day</th><th>Start</th><th>End</th><th>Status</th></tr></thead><tbody>';
+                    let html = '<table class="schedule-table"><thead><tr><th>Day</th><th>Start</th><th>End</th><th>Break</th><th>Status</th></tr></thead><tbody>';
                     
                     daysOfWeek.forEach(day => {
                         const dayData = schedule.schedule[day] || {};
                         const status = dayData.notWorking ? 'Not Working' : 'Working';
                         const start = dayData.start || '-';
                         const end = dayData.end || '-';
+                        const breakTime = dayData.breakDuration ? `${dayData.breakDuration} min` : '-';
                         
                         html += `<tr>
                             <td><strong>${day.charAt(0).toUpperCase() + day.slice(1)}</strong></td>
                             <td>${start}</td>
                             <td>${end}</td>
-                            <td>${status}</td>
+                            <td>${breakTime}</td>
+                            <td><span class="status-badge ${status.toLowerCase().replace(' ', '-')}">${status}</span></td>
                         </tr>`;
                     });
                     
                     html += '</tbody></table>';
                     displayDiv.innerHTML = html;
                 } else {
-                    displayDiv.innerHTML = '<p>No schedule found for this week.</p>';
+                    displayDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;"><i class="fas fa-calendar-times" style="font-size: 48px; margin-bottom: 20px; display: block;"></i>No schedule found for this week.</div>';
                 }
             });
 
             // Generate report button
-            document.getElementById('generate-report').addEventListener('click', async () => {
+            document.getElementById('generate-report')?.addEventListener('click', async () => {
+                const reportType = document.getElementById('report-type').value;
                 const weekStart = document.getElementById('report-week').value;
-                if (!weekStart) {
-                    showPopup('Please select a week', 'error');
+                
+                if (!weekStart && reportType !== 'monthly') {
+                    showPopup('Please select a date', 'error');
                     return;
                 }
 
-                await generateWeeklyReport(weekStart);
+                await generateAdvancedReport(reportType, weekStart);
             });
 
             // Popup close button
-            document.querySelector('.popup-close').addEventListener('click', () => {
+            document.querySelector('.popup-close')?.addEventListener('click', () => {
                 document.getElementById('popup').classList.add('hidden');
             });
 
@@ -1479,38 +2593,63 @@ async function initializeApp() {
                     const row = e.target.closest('tr');
                     const startSelect = row.querySelector('.start-time');
                     const endSelect = row.querySelector('.end-time');
+                    const breakInput = row.querySelector('.break-duration');
                     
                     if (e.target.checked) {
                         startSelect.disabled = true;
                         endSelect.disabled = true;
+                        breakInput.disabled = true;
                         startSelect.value = '';
                         endSelect.value = '';
+                        breakInput.value = '';
                     } else {
                         startSelect.disabled = false;
                         endSelect.disabled = false;
+                        breakInput.disabled = false;
                     }
                 });
             });
+
+            // Filter buttons
+            document.getElementById('apply-logs-filter')?.addEventListener('click', () => {
+                loadTimeLogsTable(); // Implement filtering logic
+            });
         }
 
-        async function generateWeeklyReport(weekStart) {
+        // Advanced Report Generation
+        async function generateAdvancedReport(reportType, startDate) {
             try {
                 showLoading(true);
                 
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekEnd.getDate() + 6);
-                weekEnd.setHours(23, 59, 59, 999);
-
-                const weekStartDate = new Date(weekStart);
-                weekStartDate.setHours(0, 0, 0, 0);
-
-                const snapshot = await db.collection('timeLogs')
-                    .where('timestamp', '>=', weekStartDate)
-                    .where('timestamp', '<=', weekEnd)
-                    .orderBy('timestamp', 'asc')
-                    .get();
-
+                let query = db.collection('timeLogs').orderBy('timestamp', 'desc');
+                let reportTitle = '';
+                let dateRange = '';
+                
+                const start = new Date(startDate);
+                let end = new Date(start);
+                
+                switch (reportType) {
+                    case 'weekly':
+                        end.setDate(end.getDate() + 7);
+                        reportTitle = 'Weekly Report';
+                        dateRange = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+                        break;
+                    case 'monthly':
+                        start.setDate(1); // First day of month
+                        end = new Date(start.getFullYear(), start.getMonth() + 1, 0); // Last day of month
+                        reportTitle = 'Monthly Report';
+                        dateRange = start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        break;
+                    default:
+                        reportTitle = 'Custom Report';
+                        dateRange = startDate;
+                }
+                
+                query = query.where('timestamp', '>=', start).where('timestamp', '<=', end);
+                
+                const snapshot = await query.get();
                 const employeeLogs = {};
+                
                 snapshot.forEach(doc => {
                     const log = doc.data();
                     if (!employeeLogs[log.employeeId]) {
@@ -1519,21 +2658,62 @@ async function initializeApp() {
                     employeeLogs[log.employeeId].push(log);
                 });
 
-                let reportHtml = '<h4>Weekly Report</h4>';
-                reportHtml += '<table class="schedule-table"><thead><tr><th>Employee</th><th>Total Hours</th><th>Days Worked</th></tr></thead><tbody>';
+                let reportHtml = `
+                    <div class="report-header">
+                        <h4><i class="fas fa-chart-line"></i> ${reportTitle}</h4>
+                        <p><strong>Period:</strong> ${dateRange}</p>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Total Hours</th>
+                                <th>Days Worked</th>
+                                <th>Avg Hours/Day</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                let totalHours = 0;
+                let totalEmployees = 0;
 
                 for (const [employeeId, logs] of Object.entries(employeeLogs)) {
-                    const totalHours = calculateWorkHours(logs);
+                    const hours = calculateWorkHours(logs);
                     const daysWorked = [...new Set(logs.map(log => log.timestamp.toDate().toDateString()))].length;
+                    const avgHours = daysWorked > 0 ? (hours / daysWorked) : 0;
+                    
+                    totalHours += hours;
+                    totalEmployees++;
+                    
+                    const status = hours >= 40 ? 'Full Time' : hours >= 20 ? 'Part Time' : 'Minimal';
+                    const statusClass = hours >= 40 ? 'success' : hours >= 20 ? 'warning' : 'danger';
                     
                     reportHtml += `<tr>
-                        <td>${employeeId}</td>
-                        <td>${totalHours.toFixed(2)}</td>
+                        <td><strong>${employeeId}</strong></td>
+                        <td>${hours.toFixed(2)}</td>
                         <td>${daysWorked}</td>
+                        <td>${avgHours.toFixed(2)}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
                     </tr>`;
                 }
 
-                reportHtml += '</tbody></table>';
+                reportHtml += `
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: var(--primary-color); color: white; font-weight: bold;">
+                                <td>TOTALS</td>
+                                <td>${totalHours.toFixed(2)}</td>
+                                <td>-</td>
+                                <td>${totalEmployees > 0 ? (totalHours / totalEmployees).toFixed(2) : '0.00'}</td>
+                                <td>${totalEmployees} Employees</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+
                 document.getElementById('report-content').innerHTML = reportHtml;
 
             } catch (error) {
@@ -1550,6 +2730,12 @@ async function initializeApp() {
         // Firebase Auth state listener
         auth.onAuthStateChanged((user) => {
             currentUser = user;
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopTimeDisplay();
+            realTimeListeners.forEach(unsubscribe => unsubscribe());
         });
     </script>
 </body>
