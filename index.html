@@ -988,31 +988,58 @@ const firebaseConfig = {
 
         // Time tracking functions
         async function logTimeAction(action) {
-            try {
-                showLoading(true);
-                
-                const location = await getCurrentLocation();
-                
-                await db.collection('timeLogs').add({
-                    employeeId: currentEmployeeId,
-                    action: action,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    location: location
+    try {
+        showLoading(true);
+        
+        // Enhanced mobile authentication
+        if (!currentUser) {
+            console.log('No user found, attempting to sign in anonymously...');
+            await auth.signInAnonymously();
+            
+            // Wait for auth state to update
+            await new Promise((resolve) => {
+                const unsubscribe = auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        unsubscribe();
+                        resolve();
+                    }
                 });
-
-                showPopup(`${action} logged successfully!`, 'success');
-                
-            } catch (error) {
-                console.error('Error logging time action:', error);
-                if (error.code === 1) { // Geolocation permission denied
-                    showPopup('Please enable location access to log time entries.', 'error');
-                } else {
-                    showPopup(`Error logging ${action}: ${error.message}`, 'error');
-                }
-            } finally {
-                showLoading(false);
-            }
+            });
         }
+        
+        // Verify we have a user
+        if (!currentUser) {
+            throw new Error('Authentication failed - please refresh the page');
+        }
+        
+        console.log('User authenticated:', currentUser.uid);
+        
+        const location = await getCurrentLocation();
+        
+        await db.collection('timeLogs').add({
+            employeeId: currentEmployeeId,
+            action: action,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            location: location
+        });
+
+        showPopup(`${action} logged successfully!`, 'success');
+        
+    } catch (error) {
+        console.error('Error logging time action:', error);
+        if (error.code === 1) { // Geolocation permission denied
+            showPopup('Please enable location access to log time entries.', 'error');
+        } else if (error.message.includes('permission') || error.message.includes('insufficient')) {
+            showPopup('Authentication error - please refresh the page and try again.', 'error');
+        } else {
+            showPopup(`Error logging ${action}: ${error.message}`, 'error');
+        }
+    } finally {
+        showLoading(false);
+    }
+}
+
 
         // Employee history functions
         async function loadEmployeeHistory() {
