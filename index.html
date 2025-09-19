@@ -1242,23 +1242,36 @@ const firebaseConfig = {
         }
 
         // Initialization
-        function initializeApp() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const employeeId = urlParams.get('id');
-
-            if (employeeId) {
-                // Employee interface
-                currentEmployeeId = employeeId;
-                document.querySelector('.employee-id').textContent = `Employee ID: ${employeeId}`;
-                showView('employee-view');
-            } else {
-                // Admin login
-                showView('admin-login');
-            }
-
-            populateTimeDropdowns();
-            setupEventListeners();
+async function initializeApp() {
+    try {
+        // Force anonymous authentication on app start
+        if (!auth.currentUser) {
+            console.log('Signing in anonymously...');
+            await auth.signInAnonymously();
         }
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const employeeId = urlParams.get('id');
+
+        if (employeeId) {
+            // Employee interface
+            currentEmployeeId = employeeId;
+            document.querySelector('.employee-id').textContent = `Employee ID: ${employeeId}`;
+            showView('employee-view');
+        } else {
+            // Admin login
+            showView('admin-login');
+        }
+
+        populateTimeDropdowns();
+        setupEventListeners();
+        
+    } catch (error) {
+        console.error('Initialization error:', error);
+        showPopup('App initialization failed - please refresh the page', 'error');
+    }
+}
+
 
         function setupEventListeners() {
             // Time tracking buttons
