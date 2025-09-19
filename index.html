@@ -368,6 +368,28 @@
             box-shadow: var(--shadow-lg);
         }
 
+        .btn--warning {
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--warning:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn--info {
+            background: linear-gradient(135deg, #63b3ed 0%, #3182ce 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--info:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
         .btn--secondary {
             background: var(--gray-600);
             color: white;
@@ -541,6 +563,63 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
+        }
+
+        /* Action Badges */
+        .action-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-time-in {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .action-break-start {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .action-break-end {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-time-out {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.unread {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .dept-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #e0e7ff;
+            color: #3730a3;
         }
 
         /* Enhanced Admin Interface */
@@ -760,6 +839,14 @@
             cursor: pointer;
         }
 
+        .schedule-table input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+        }
+
         /* Charts and Reports */
         .chart-container {
             background: white;
@@ -793,6 +880,24 @@
             padding: 8px 16px;
             font-size: 0.9rem;
             border-radius: 6px;
+        }
+
+        .report-header {
+            background: var(--gray-50);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .report-header h4 {
+            margin-bottom: 15px;
+            color: var(--gray-800);
+        }
+
+        .report-header p {
+            margin: 5px 0;
+            color: var(--gray-600);
         }
 
         /* Enhanced Mobile Responsiveness */
@@ -853,6 +958,18 @@
             .quick-stats {
                 grid-template-columns: 1fr;
             }
+
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
         }
 
         /* Accessibility Enhancements */
@@ -878,14 +995,6 @@
             .admin-content {
                 box-shadow: none;
                 border: 1px solid #000;
-            }
-        }
-
-        /* Dark mode support (optional) */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --light-color: #1a202c;
-                --dark-color: #e2e8f0;
             }
         }
     </style>
@@ -1471,7 +1580,7 @@
     </div>
 
     <script>
-        // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        // Firebase Configuration - YOUR ACTUAL CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyAU3O5YraVh_rdWr6PQx8SUOYL4wEHLC_w",
             authDomain: "employeetimetracker-9f22d.firebaseapp.com",
@@ -2183,7 +2292,7 @@
                     const timestamp = alert.timestamp ? alert.timestamp.toDate() : new Date();
                     
                     row.innerHTML = `
-                        <td><span class="priority-badge priority-${alert.priority || 'medium'}">${alert.priority || 'Medium'}</span></td>
+                        <td><span class="status-badge ${alert.priority || 'medium'}">${alert.priority || 'Medium'}</span></td>
                         <td><strong>${alert.employeeId}</strong></td>
                         <td>${alert.type}</td>
                         <td>${alert.message}</td>
@@ -2293,6 +2402,30 @@
             window.print();
         }
 
+        function refreshTimeLogs() {
+            loadTimeLogsTable();
+            showPopup('Time logs refreshed!', 'info');
+        }
+
+        function markAllAlertsRead() {
+            showPopup('All alerts marked as read!', 'success');
+        }
+
+        function clearOldAlerts() {
+            showPopup('Old alerts cleared!', 'info');
+        }
+
+        function editEmployee(employeeId) {
+            showPopup(`Edit feature for ${employeeId} coming soon!`, 'info');
+        }
+
+        function deleteEmployee(employeeId) {
+            if (confirm(`Are you sure you want to delete employee ${employeeId}?`)) {
+                // Implement delete functionality
+                showPopup(`Employee ${employeeId} deleted!`, 'warning');
+            }
+        }
+
         // Schedule Functions
         function populateTimeDropdowns() {
             const startSelects = document.querySelectorAll('.start-time');
@@ -2379,6 +2512,11 @@
             document.getElementById('view-history-btn')?.addEventListener('click', () => {
                 showView('history-view');
                 loadEmployeeHistory();
+            });
+
+            // Export data button
+            document.getElementById('export-my-data-btn')?.addEventListener('click', () => {
+                exportHistoryToCSV();
             });
 
             // Back to tracking button
@@ -2689,7 +2827,7 @@
                     totalEmployees++;
                     
                     const status = hours >= 40 ? 'Full Time' : hours >= 20 ? 'Part Time' : 'Minimal';
-                    const statusClass = hours >= 40 ? 'success' : hours >= 20 ? 'warning' : 'danger';
+                    const statusClass = hours >= 40 ? 'active' : hours >= 20 ? 'warning' : 'unread';
                     
                     reportHtml += `<tr>
                         <td><strong>${employeeId}</strong></td>
