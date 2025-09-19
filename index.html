@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimeTracker Pro - Employee Time Management</title>
+    <title>TimeTracker Pro - Secure Employee Time Management</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
@@ -195,6 +195,42 @@
             content: "⚠️";
         }
 
+        .popup.location-error .popup-icon::before {
+            content: "📍";
+        }
+
+        /* Location Status Indicator */
+        .location-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .location-status.in-range {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .location-status.out-of-range {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .location-status.checking {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .location-status.disabled {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
         /* View Management */
         .view {
             display: none;
@@ -203,6 +239,88 @@
 
         .view.active {
             display: block;
+        }
+
+        /* Employee Login Interface */
+        .employee-login {
+            max-width: 450px;
+            margin: 100px auto;
+            background: white;
+            padding: 50px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .employee-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-primary);
+        }
+
+        .employee-login h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 15px;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         /* Enhanced Employee Interface */
@@ -237,11 +355,32 @@
             font-weight: 700;
         }
 
-        .employee-id {
+        .employee-info {
             font-size: 1.3rem;
             color: var(--gray-600);
             font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .employee-department {
+            font-size: 1.1rem;
+            color: var(--gray-500);
             margin-bottom: 20px;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
 
         /* Status Indicator */
@@ -465,44 +604,71 @@
             margin-top: 5px;
         }
 
-        /* Enhanced History View */
-        .history-header {
+        /* Week Picker */
+        .week-picker {
+            position: relative;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 25px 30px;
+            gap: 10px;
+        }
+
+        .week-display {
+            background: var(--gray-100);
+            padding: 10px 15px;
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .history-filters {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .filter-group label {
-            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--gray-600);
+            min-width: 200px;
+            text-align: center;
         }
 
-        .history-content {
+        .week-nav {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .week-nav:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: var(--gray-300);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: var(--success-color);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(28px);
         }
 
         /* Enhanced Tables */
@@ -595,34 +761,36 @@
             color: #be185d;
         }
 
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
+        /* Password Strength Indicator */
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--gray-200);
+            overflow: hidden;
         }
 
-        .status-badge.active {
-            background: #d1fae5;
-            color: #065f46;
+        .password-strength-bar {
+            height: 100%;
+            transition: var(--transition);
         }
 
-        .status-badge.unread {
-            background: #fef3c7;
-            color: #92400e;
+        .password-strength.weak .password-strength-bar {
+            width: 33%;
+            background: var(--danger-color);
         }
 
-        .dept-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            background: #e0e7ff;
-            color: #3730a3;
+        .password-strength.medium .password-strength-bar {
+            width: 66%;
+            background: var(--warning-color);
         }
 
-        /* Enhanced Admin Interface */
+        .password-strength.strong .password-strength-bar {
+            width: 100%;
+            background: var(--success-color);
+        }
+
+        /* Admin Interface Styles */
         .admin-login {
             max-width: 450px;
             margin: 100px auto;
@@ -654,34 +822,6 @@
             font-size: 2rem;
         }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--gray-700);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 15px 20px;
-            border: 2px solid var(--gray-300);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        /* Enhanced Admin Dashboard */
         .admin-header {
             background: white;
             padding: 30px;
@@ -772,7 +912,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* Enhanced Forms */
         .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -787,117 +926,6 @@
             margin-top: 30px;
             padding-top: 25px;
             border-top: 1px solid var(--gray-200);
-        }
-
-        /* Schedule Management */
-        .schedule-sub-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .schedule-sub-tab {
-            padding: 12px 20px;
-            background: var(--gray-200);
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .schedule-sub-tab.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .schedule-table {
-            width: 100%;
-            margin-top: 25px;
-        }
-
-        .schedule-table th {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .schedule-table td {
-            padding: 15px 12px;
-            vertical-align: middle;
-        }
-
-        .schedule-table select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--gray-300);
-            border-radius: 6px;
-            background: white;
-        }
-
-        .schedule-table input[type="checkbox"] {
-            transform: scale(1.3);
-            cursor: pointer;
-        }
-
-        .schedule-table input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--gray-300);
-            border-radius: 6px;
-            background: white;
-        }
-
-        /* Charts and Reports */
-        .chart-container {
-            background: white;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .chart-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--gray-800);
-        }
-
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-export {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            border-radius: 6px;
-        }
-
-        .report-header {
-            background: var(--gray-50);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            margin-bottom: 25px;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .report-header h4 {
-            margin-bottom: 15px;
-            color: var(--gray-800);
-        }
-
-        .report-header p {
-            margin: 5px 0;
-            color: var(--gray-600);
         }
 
         /* Enhanced Mobile Responsiveness */
@@ -925,32 +953,6 @@
                 min-height: 75px;
             }
 
-            .admin-tabs {
-                flex-wrap: wrap;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .history-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .history-filters {
-                justify-content: center;
-            }
-
-            .table-container {
-                font-size: 0.85rem;
-            }
-
-            th, td {
-                padding: 12px 8px;
-            }
-
             .current-time-display {
                 font-size: 2rem;
             }
@@ -963,38 +965,13 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .export-buttons {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .login-tabs {
                 flex-direction: column;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-        }
-
-        /* Accessibility Enhancements */
-        .btn:focus {
-            outline: 3px solid rgba(102, 126, 234, 0.3);
-            outline-offset: 2px;
-        }
-
-        .form-control:focus {
-            outline: 3px solid rgba(102, 126, 234, 0.3);
-            outline-offset: 2px;
-        }
-
-        /* Print Styles */
-        @media print {
-            .admin-tabs,
-            .admin-header .btn,
-            .form-actions,
-            .btn {
-                display: none !important;
-            }
-
-            .admin-content {
-                box-shadow: none;
-                border: 1px solid #000;
             }
         }
     </style>
@@ -1016,11 +993,64 @@
     </div>
 
     <div class="container">
+        <!-- Employee & Admin Login -->
+        <div id="login-view" class="view">
+            <div class="employee-login">
+                <h2><i class="fas fa-user-shield"></i> TimeTracker Pro Login</h2>
+                
+                <div class="login-tabs">
+                    <button class="login-tab active" data-tab="employee">
+                        <i class="fas fa-user"></i> Employee
+                    </button>
+                    <button class="login-tab" data-tab="admin">
+                        <i class="fas fa-user-cog"></i> Admin
+                    </button>
+                </div>
+
+                <!-- Employee Login Form -->
+                <form id="employee-login-form" class="login-form active">
+                    <div class="form-group">
+                        <label for="employee-id"><i class="fas fa-id-card"></i> Employee ID:</label>
+                        <input type="text" id="employee-id" class="form-control" placeholder="Enter your Employee ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-password"><i class="fas fa-key"></i> Password:</label>
+                        <input type="password" id="employee-password" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i> Login as Employee
+                    </button>
+                </form>
+
+                <!-- Admin Login Form -->
+                <form id="admin-login-form" class="login-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="admin-password"><i class="fas fa-key"></i> Admin Password:</label>
+                        <input type="password" id="admin-password" class="form-control" placeholder="Enter admin password" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i> Login as Admin
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <!-- Employee Interface -->
         <div id="employee-view" class="view">
             <div class="employee-header">
+                <button id="employee-logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
                 <h1><i class="fas fa-clock"></i> TimeTracker Pro</h1>
-                <div class="employee-id"></div>
+                <div class="employee-info" id="employee-name"></div>
+                <div class="employee-department" id="employee-dept"></div>
+                
+                <!-- Location Status Indicator -->
+                <div id="location-status" class="location-status checking">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Checking your location...</span>
+                </div>
+                
                 <div id="current-status" class="status-card clocked-out">
                     <i class="fas fa-user-clock"></i>
                     <span>Currently Clocked Out</span>
@@ -1079,18 +1109,18 @@
 
         <!-- Employee History View -->
         <div id="history-view" class="view">
-            <div class="history-header">
+            <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 25px 30px; border-radius: var(--border-radius); box-shadow: var(--shadow); flex-wrap: wrap; gap: 15px;">
                 <h2><i class="fas fa-history"></i> My Time History</h2>
-                <div class="history-filters">
-                    <div class="filter-group">
-                        <label>From Date</label>
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-size: 0.9rem; font-weight: 600; color: var(--gray-600);">From Date</label>
                         <input type="date" id="filter-from-date" class="form-control">
                     </div>
-                    <div class="filter-group">
-                        <label>To Date</label>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-size: 0.9rem; font-weight: 600; color: var(--gray-600);">To Date</label>
                         <input type="date" id="filter-to-date" class="form-control">
                     </div>
-                    <div class="filter-group">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
                         <label>&nbsp;</label>
                         <button id="apply-date-filter" class="btn btn--primary">
                             <i class="fas fa-filter"></i> Apply Filter
@@ -1103,14 +1133,14 @@
             </div>
 
             <!-- Daily Summary Charts -->
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3 class="chart-title">Daily Hours Overview</h3>
-                    <div class="export-buttons">
-                        <button class="btn btn--secondary btn-export" onclick="exportHistoryToCSV()">
+            <div style="background: white; padding: 30px; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-200);">
+                    <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--gray-800);">Daily Hours Overview</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 6px;" onclick="exportHistoryToCSV()">
                             <i class="fas fa-file-csv"></i> CSV
                         </button>
-                        <button class="btn btn--secondary btn-export" onclick="printHistory()">
+                        <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 6px;" onclick="printHistory()">
                             <i class="fas fa-print"></i> Print
                         </button>
                     </div>
@@ -1118,7 +1148,7 @@
                 <canvas id="history-chart" width="400" height="150"></canvas>
             </div>
 
-            <div class="history-content">
+            <div style="background: white; border-radius: var(--border-radius); box-shadow: var(--shadow-lg); overflow: hidden;">
                 <div class="table-container">
                     <table id="history-table">
                         <thead>
@@ -1137,22 +1167,6 @@
                     <i class="fas fa-calculator"></i>
                     <span>Total Hours Worked: 0.00</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Admin Login -->
-        <div id="admin-login" class="view">
-            <div class="admin-login">
-                <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="admin-password"><i class="fas fa-key"></i> Password:</label>
-                        <input type="password" id="admin-password" class="form-control" placeholder="Enter admin password" required>
-                    </div>
-                    <button type="submit" class="btn btn--primary" style="width: 100%;">
-                        <i class="fas fa-sign-in-alt"></i> Login to Dashboard
-                    </button>
-                </form>
             </div>
         </div>
 
@@ -1195,14 +1209,11 @@
                 <button class="admin-tab" data-tab="timelogs">
                     <i class="fas fa-list-alt"></i> Time Logs
                 </button>
-                <button class="admin-tab" data-tab="alerts">
-                    <i class="fas fa-exclamation-triangle"></i> Alerts
+                <button class="admin-tab" data-tab="settings">
+                    <i class="fas fa-cogs"></i> Location Settings
                 </button>
                 <button class="admin-tab" data-tab="reports">
                     <i class="fas fa-chart-bar"></i> Reports
-                </button>
-                <button class="admin-tab" data-tab="analytics">
-                    <i class="fas fa-analytics"></i> Analytics
                 </button>
             </div>
 
@@ -1249,21 +1260,27 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-key"></i> Initial Password:</label>
+                                <input type="password" id="emp-initial-password" class="form-control" placeholder="Create password for employee" required>
+                                <div class="password-strength" id="password-strength">
+                                    <div class="password-strength-bar"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn--success">
                                 <i class="fas fa-plus"></i> Add Employee
-                            </button>
-                            <button type="button" id="bulk-import-btn" class="btn btn--secondary">
-                                <i class="fas fa-upload"></i> Bulk Import
                             </button>
                         </div>
                     </form>
 
                     <div style="margin-top: 40px;">
-                        <div class="chart-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-200);">
                             <h4><i class="fas fa-users"></i> Current Employees</h4>
-                            <div class="export-buttons">
-                                <button class="btn btn--secondary btn-export" onclick="exportEmployeesToCSV()">
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 6px;" onclick="exportEmployeesToCSV()">
                                     <i class="fas fa-download"></i> Export
                                 </button>
                             </div>
@@ -1287,115 +1304,112 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Schedules Tab -->
+                <!-- Enhanced Schedules Tab with Week Selection -->
                 <div id="schedules-tab" class="tab-content">
-                    <h3><i class="fas fa-calendar-plus"></i> Schedule Management</h3>
-                    <div class="schedule-sub-tabs">
-                        <button class="schedule-sub-tab active" data-subtab="enter">
-                            <i class="fas fa-edit"></i> Enter Schedule
-                        </button>
-                        <button class="schedule-sub-tab" data-subtab="view">
-                            <i class="fas fa-eye"></i> View Schedule
-                        </button>
-                        <button class="schedule-sub-tab" data-subtab="templates">
-                            <i class="fas fa-copy"></i> Templates
-                        </button>
-                    </div>
-
-                    <div id="enter-schedule" class="schedule-subtab-content">
-                        <form id="schedule-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label><i class="fas fa-user"></i> Employee:</label>
-                                    <select id="schedule-employee" class="form-control" required>
-                                        <option value="">Select Employee</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label><i class="fas fa-calendar"></i> Week Starting:</label>
-                                    <input type="date" id="schedule-week" class="form-control" required>
-                                </div>
-                            </div>
-
-                            <table class="schedule-table">
-                                <thead>
-                                    <tr>
-                                        <th>Day</th>
-                                        <th>Start Time</th>
-                                        <th>End Time</th>
-                                        <th>Break Duration</th>
-                                        <th>Not Working</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr data-day="monday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Monday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                    <tr data-day="tuesday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Tuesday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                    <tr data-day="wednesday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Wednesday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                    <tr data-day="thursday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Thursday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                    <tr data-day="friday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Friday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                    <tr data-day="saturday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Saturday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                    <tr data-day="sunday">
-                                        <td><strong><i class="fas fa-calendar-day"></i> Sunday</strong></td>
-                                        <td><select class="start-time form-control"></select></td>
-                                        <td><select class="end-time form-control"></select></td>
-                                        <td><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
-                                        <td><input type="checkbox" class="not-working"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div class="form-actions">
-                                <button type="button" id="copy-schedule" class="btn btn--secondary">
-                                    <i class="fas fa-copy"></i> Copy Monday to All Working Days
-                                </button>
-                                <button type="button" id="save-template" class="btn btn--info">
-                                    <i class="fas fa-save"></i> Save as Template
-                                </button>
-                                <button type="submit" class="btn btn--success">
-                                    <i class="fas fa-check"></i> Save Schedule
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div id="view-schedule" class="schedule-subtab-content" style="display: none;">
+                    <h3><i class="fas fa-calendar-plus"></i> Weekly Schedule Management</h3>
+                    
+                    <form id="schedule-form">
                         <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Employee:</label>
+                                <select id="schedule-employee" class="form-control" required>
+                                    <option value="">Select Employee</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-week"></i> Select Week:</label>
+                                <div class="week-picker">
+                                    <button type="button" class="week-nav" id="prev-week">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <div class="week-display" id="week-display">
+                                        Select a week
+                                    </div>
+                                    <button type="button" class="week-nav" id="next-week">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="selected-week-start" required>
+                            </div>
+                        </div>
+
+                        <table style="width: 100%; margin-top: 25px; background: white; border: 1px solid var(--gray-300); border-radius: var(--border-radius); overflow: hidden;">
+                            <thead>
+                                <tr style="background: var(--primary-color); color: white;">
+                                    <th style="padding: 15px 12px;">Day</th>
+                                    <th style="padding: 15px 12px;">Start Time</th>
+                                    <th style="padding: 15px 12px;">End Time</th>
+                                    <th style="padding: 15px 12px;">Break Duration (mins)</th>
+                                    <th style="padding: 15px 12px;">Not Working</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-day="monday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Monday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                                <tr data-day="tuesday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Tuesday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                                <tr data-day="wednesday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Wednesday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                                <tr data-day="thursday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Thursday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                                <tr data-day="friday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Friday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                                <tr data-day="saturday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Saturday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                                <tr data-day="sunday">
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><strong><i class="fas fa-calendar-day"></i> Sunday</strong></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="start-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><select class="end-time form-control"></select></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle;"><input type="number" class="break-duration form-control" placeholder="60" min="0" max="480" step="15"></td>
+                                    <td style="padding: 15px 12px; vertical-align: middle; text-align: center;"><input type="checkbox" class="not-working" style="transform: scale(1.3); cursor: pointer;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="form-actions">
+                            <button type="button" id="copy-schedule" class="btn btn--secondary">
+                                <i class="fas fa-copy"></i> Copy Monday to All Working Days
+                            </button>
+                            <button type="submit" class="btn btn--success">
+                                <i class="fas fa-check"></i> Save Weekly Schedule
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- View Existing Schedules -->
+                    <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--gray-200);">
+                        <h4><i class="fas fa-eye"></i> View Existing Schedules</h4>
+                        <div class="form-row" style="margin-top: 20px;">
                             <div class="form-group">
                                 <label><i class="fas fa-user"></i> Employee:</label>
                                 <select id="view-schedule-employee" class="form-control">
@@ -1403,8 +1417,19 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Week Starting:</label>
-                                <input type="date" id="view-schedule-week" class="form-control">
+                                <label><i class="fas fa-calendar-week"></i> Select Week:</label>
+                                <div class="week-picker">
+                                    <button type="button" class="week-nav" id="view-prev-week">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <div class="week-display" id="view-week-display">
+                                        Select a week
+                                    </div>
+                                    <button type="button" class="week-nav" id="view-next-week">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="view-selected-week-start">
                             </div>
                             <div class="form-group">
                                 <label>&nbsp;</label>
@@ -1415,62 +1440,32 @@
                         </div>
                         <div id="schedule-display"></div>
                     </div>
-
-                    <div id="templates-schedule" class="schedule-subtab-content" style="display: none;">
-                        <h4><i class="fas fa-layer-group"></i> Schedule Templates</h4>
-                        <div id="schedule-templates">
-                            <!-- Templates will be loaded here -->
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Enhanced Time Logs Tab -->
+                <!-- Time Logs Tab -->
                 <div id="timelogs-tab" class="tab-content">
-                    <div class="chart-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-200);">
                         <h3><i class="fas fa-list-alt"></i> Time Logs</h3>
-                        <div class="export-buttons">
-                            <button class="btn btn--secondary btn-export" onclick="exportTimeLogsToCSV()">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 6px;" onclick="exportTimeLogsToCSV()">
                                 <i class="fas fa-file-csv"></i> Export CSV
                             </button>
-                            <button class="btn btn--info btn-export" onclick="refreshTimeLogs()">
+                            <button class="btn btn--info" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 6px;" onclick="refreshTimeLogs()">
                                 <i class="fas fa-sync-alt"></i> Refresh
                             </button>
                         </div>
                     </div>
                     
-                    <!-- Real-time filters -->
-                    <div class="form-row" style="margin-bottom: 25px;">
-                        <div class="form-group">
-                            <label><i class="fas fa-filter"></i> Filter by Employee:</label>
-                            <select id="logs-employee-filter" class="form-control">
-                                <option value="">All Employees</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Date Range:</label>
-                            <input type="date" id="logs-date-from" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>&nbsp;</label>
-                            <input type="date" id="logs-date-to" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>&nbsp;</label>
-                            <button id="apply-logs-filter" class="btn btn--primary">
-                                <i class="fas fa-search"></i> Apply Filter
-                            </button>
-                        </div>
-                    </div>
-
                     <div class="table-container">
                         <table id="timelogs-table">
                             <thead>
                                 <tr>
                                     <th>Employee ID</th>
+                                    <th>Employee Name</th>
                                     <th>Action</th>
                                     <th>Timestamp</th>
                                     <th>Location</th>
-                                    <th>Session Duration</th>
+                                    <th>Distance</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1478,59 +1473,113 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Alerts Tab -->
-                <div id="alerts-tab" class="tab-content">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-exclamation-triangle"></i> System Alerts</h3>
-                        <div class="export-buttons">
-                            <button class="btn btn--warning btn-export" onclick="markAllAlertsRead()">
-                                <i class="fas fa-check-double"></i> Mark All Read
+                <!-- New Location Settings Tab -->
+                <div id="settings-tab" class="tab-content">
+                    <h3><i class="fas fa-cogs"></i> Location & Security Settings</h3>
+                    
+                    <div style="background: var(--gray-50); padding: 25px; border-radius: var(--border-radius); margin-bottom: 25px; border-left: 4px solid var(--primary-color);">
+                        <h4 style="margin-bottom: 15px; color: var(--gray-800);"><i class="fas fa-map-marker-alt"></i> Geofencing Settings</h4>
+                        <p style="color: var(--gray-600); margin-bottom: 20px;">Control where employees can clock in and out based on their GPS location.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-toggle-on"></i> Enable Location Verification:</label>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                                <div class="toggle-switch" id="location-enforcement-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                                <span id="location-enforcement-status">Disabled</span>
+                            </div>
+                            <small style="color: var(--gray-500); display: block; margin-top: 5px;">
+                                When enabled, employees must be within the specified range of the office location to clock in/out.
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-ruler"></i> Maximum Distance (meters):</label>
+                            <input type="number" id="max-distance" class="form-control" placeholder="100" min="10" max="1000" step="10">
+                            <small style="color: var(--gray-500); display: block; margin-top: 5px;">
+                                Employees must be within this distance from the office to clock in/out.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--gray-200);">
+                        <h4><i class="fas fa-building"></i> Office Location</h4>
+                        <p style="color: var(--gray-600); margin-bottom: 20px;">Set your office address for location verification.</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-map-marker-alt"></i> Office Address:</label>
+                                <input type="text" id="office-address" class="form-control" placeholder="42838 Dobson Ct, Broadlands, VA 20148">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-compass"></i> GPS Coordinates:</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="office-latitude" class="form-control" placeholder="Latitude" step="any">
+                                    <input type="number" id="office-longitude" class="form-control" placeholder="Longitude" step="any">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button id="geocode-address" class="btn btn--info">
+                                <i class="fas fa-search"></i> Auto-Detect Coordinates
                             </button>
-                            <button class="btn btn--danger btn-export" onclick="clearOldAlerts()">
-                                <i class="fas fa-trash"></i> Clear Old Alerts
+                            <button id="save-location-settings" class="btn btn--success">
+                                <i class="fas fa-save"></i> Save Settings
                             </button>
                         </div>
                     </div>
-                    <div class="table-container">
-                        <table id="alerts-table">
-                            <thead>
-                                <tr>
-                                    <th>Priority</th>
-                                    <th>Employee ID</th>
-                                    <th>Alert Type</th>
-                                    <th>Message</th>
-                                    <th>Timestamp</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+
+                    <!-- Current Settings Display -->
+                    <div style="margin-top: 30px; padding: 20px; background: var(--gray-50); border-radius: var(--border-radius);">
+                        <h4><i class="fas fa-info-circle"></i> Current Settings</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
+                            <div>
+                                <strong>Location Verification:</strong>
+                                <span id="current-enforcement-status" style="margin-left: 10px; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem;">Loading...</span>
+                            </div>
+                            <div>
+                                <strong>Max Distance:</strong>
+                                <span id="current-max-distance">Loading...</span>
+                            </div>
+                            <div>
+                                <strong>Office Location:</strong>
+                                <span id="current-office-address">Loading...</span>
+                            </div>
+                            <div>
+                                <strong>Coordinates:</strong>
+                                <span id="current-coordinates">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Enhanced Reports Tab -->
+                <!-- Reports Tab -->
                 <div id="reports-tab" class="tab-content">
-                    <h3><i class="fas fa-chart-bar"></i> Advanced Reports</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Weekly Reports</h3>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Report Type:</label>
-                            <select id="report-type" class="form-control">
-                                <option value="weekly">Weekly Report</option>
-                                <option value="monthly">Monthly Report</option>
-                                <option value="custom">Custom Date Range</option>
-                                <option value="employee">Individual Employee</option>
-                                <option value="department">Department Summary</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-week"></i> Week/Period Starting:</label>
-                            <input type="date" id="report-week" class="form-control">
+                            <label><i class="fas fa-calendar-week"></i> Select Week:</label>
+                            <div class="week-picker">
+                                <button type="button" class="week-nav" id="report-prev-week">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="week-display" id="report-week-display">
+                                    Current week
+                                </div>
+                                <button type="button" class="week-nav" id="report-next-week">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="report-selected-week-start">
                         </div>
                         <div class="form-group">
                             <label>&nbsp;</label>
                             <button id="generate-report" class="btn btn--success">
-                                <i class="fas fa-chart-line"></i> Generate Report
+                                <i class="fas fa-chart-line"></i> Generate Weekly Report
                             </button>
                         </div>
                     </div>
@@ -1539,48 +1588,12 @@
                         <!-- Reports will be generated here -->
                     </div>
                 </div>
-
-                <!-- New Analytics Tab -->
-                <div id="analytics-tab" class="tab-content">
-                    <h3><i class="fas fa-analytics"></i> Analytics Dashboard</h3>
-                    
-                    <!-- Analytics Charts -->
-                    <div class="form-row">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Daily Hours Trend</h4>
-                            </div>
-                            <canvas id="daily-hours-chart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Department Hours Distribution</h4>
-                            </div>
-                            <canvas id="department-chart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Employee Attendance Rate</h4>
-                            </div>
-                            <canvas id="attendance-chart" width="400" height="200"></canvas>
-                        </div>
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Peak Hours Activity</h4>
-                            </div>
-                            <canvas id="peak-hours-chart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Firebase Configuration - YOUR ACTUAL CONFIG
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAU3O5YraVh_rdWr6PQx8SUOYL4wEHLC_w",
             authDomain: "employeetimetracker-9f22d.firebaseapp.com",
@@ -1598,12 +1611,23 @@
 
         // Global variables
         let currentEmployeeId = null;
+        let currentEmployeeData = null;
         let currentUser = null;
         let isAdmin = false;
-        let realTimeListeners = [];
-        let currentEmployeeStatus = 'clocked-out'; // 'clocked-in', 'on-break', 'clocked-out'
+        let currentEmployeeStatus = 'clocked-out';
         let currentTimeInterval = null;
         let historyChart = null;
+        let currentWeek = new Date();
+        let viewCurrentWeek = new Date();
+        let reportCurrentWeek = new Date();
+        let locationSettings = {
+            enforceLocation: false,
+            maxDistance: 100,
+            officeLatitude: 39.0438,  // Approximate coordinates for Broadlands, VA
+            officeLongitude: -77.3933,
+            officeAddress: "42838 Dobson Ct, Broadlands, VA 20148"
+        };
+        let currentEmployeeLocation = null;
 
         // Time slots for schedule dropdowns (15-minute increments)
         const timeSlots = [
@@ -1620,7 +1644,7 @@
 
         const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-        // Enhanced Utility Functions
+        // Utility Functions
         function showLoading(show = true) {
             const overlay = document.getElementById('loading-overlay');
             if (show) {
@@ -1653,6 +1677,163 @@
             document.getElementById(viewId).classList.add('active');
         }
 
+        // Location and Distance Functions
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                    Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c; // Distance in meters
+        }
+
+        function formatDistance(meters) {
+            if (meters < 1000) {
+                return `${Math.round(meters)}m`;
+            } else {
+                return `${(meters/1000).toFixed(1)}km`;
+            }
+        }
+
+        async function loadLocationSettings() {
+            try {
+                const doc = await db.collection('settings').doc('location').get();
+                if (doc.exists) {
+                    locationSettings = { ...locationSettings, ...doc.data() };
+                }
+                updateLocationSettingsDisplay();
+            } catch (error) {
+                console.error('Error loading location settings:', error);
+            }
+        }
+
+        async function saveLocationSettings() {
+            try {
+                await db.collection('settings').doc('location').set(locationSettings);
+                showPopup('Location settings saved successfully!', 'success');
+                updateLocationSettingsDisplay();
+            } catch (error) {
+                console.error('Error saving location settings:', error);
+                showPopup('Error saving location settings: ' + error.message, 'error');
+            }
+        }
+
+        function updateLocationSettingsDisplay() {
+            // Update settings form
+            document.getElementById('location-enforcement-toggle').classList.toggle('active', locationSettings.enforceLocation);
+            document.getElementById('location-enforcement-status').textContent = locationSettings.enforceLocation ? 'Enabled' : 'Disabled';
+            document.getElementById('max-distance').value = locationSettings.maxDistance;
+            document.getElementById('office-address').value = locationSettings.officeAddress;
+            document.getElementById('office-latitude').value = locationSettings.officeLatitude;
+            document.getElementById('office-longitude').value = locationSettings.officeLongitude;
+
+            // Update current settings display
+            const enforcementSpan = document.getElementById('current-enforcement-status');
+            enforcementSpan.textContent = locationSettings.enforceLocation ? 'Enabled' : 'Disabled';
+            enforcementSpan.style.background = locationSettings.enforceLocation ? '#d1fae5' : '#fef3c7';
+            enforcementSpan.style.color = locationSettings.enforceLocation ? '#065f46' : '#92400e';
+
+            document.getElementById('current-max-distance').textContent = `${locationSettings.maxDistance} meters`;
+            document.getElementById('current-office-address').textContent = locationSettings.officeAddress;
+            document.getElementById('current-coordinates').textContent = 
+                `${locationSettings.officeLatitude.toFixed(6)}, ${locationSettings.officeLongitude.toFixed(6)}`;
+        }
+
+        async function checkLocationPermissions() {
+            if (!navigator.geolocation) {
+                updateLocationStatus('disabled', 'Location not supported');
+                return false;
+            }
+
+            try {
+                updateLocationStatus('checking', 'Checking your location...');
+                const position = await getCurrentLocation();
+                currentEmployeeLocation = position;
+                
+                if (locationSettings.enforceLocation) {
+                    const distance = calculateDistance(
+                        position.lat, 
+                        position.lng, 
+                        locationSettings.officeLatitude, 
+                        locationSettings.officeLongitude
+                    );
+                    
+                    if (distance <= locationSettings.maxDistance) {
+                        updateLocationStatus('in-range', `You are ${formatDistance(distance)} from office (within range)`);
+                        return true;
+                    } else {
+                        updateLocationStatus('out-of-range', `You are ${formatDistance(distance)} from office (too far)`);
+                        return false;
+                    }
+                } else {
+                    updateLocationStatus('disabled', 'Location verification disabled');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Location error:', error);
+                updateLocationStatus('out-of-range', 'Could not determine your location');
+                return false;
+            }
+        }
+
+        function updateLocationStatus(status, message) {
+            const locationStatus = document.getElementById('location-status');
+            if (!locationStatus) return;
+            
+            locationStatus.className = `location-status ${status}`;
+            locationStatus.querySelector('span').textContent = message;
+        }
+
+        async function geocodeAddress() {
+            const address = document.getElementById('office-address').value;
+            if (!address) {
+                showPopup('Please enter an office address first', 'error');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                // Using a simple geocoding approach (in production, use Google Maps API)
+                showPopup('For accurate coordinates, please manually enter the GPS coordinates for your office address.', 'info');
+                
+                // Default coordinates for Broadlands, VA area
+                document.getElementById('office-latitude').value = 39.0438;
+                document.getElementById('office-longitude').value = -77.3933;
+                
+            } catch (error) {
+                showPopup('Error geocoding address: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Password Strength Checker
+        function checkPasswordStrength(password) {
+            const strengthElement = document.getElementById('password-strength');
+            if (!strengthElement) return;
+
+            let strength = 0;
+            if (password.length >= 8) strength += 1;
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+            strengthElement.className = 'password-strength';
+            if (strength <= 1) {
+                strengthElement.classList.add('weak');
+            } else if (strength <= 2) {
+                strengthElement.classList.add('medium');
+            } else {
+                strengthElement.classList.add('strong');
+            }
+        }
+
         // Enhanced Time Display
         function updateCurrentTime() {
             const now = new Date();
@@ -1678,6 +1859,72 @@
                 clearInterval(currentTimeInterval);
                 currentTimeInterval = null;
             }
+        }
+
+        // Week Management Functions
+        function getMondayOfWeek(date) {
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function getSundayOfWeek(mondayDate) {
+            const sunday = new Date(mondayDate);
+            sunday.setDate(sunday.getDate() + 6);
+            return sunday;
+        }
+
+        function formatWeekRange(mondayDate) {
+            const sunday = getSundayOfWeek(new Date(mondayDate));
+            return `${mondayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        }
+
+        function updateWeekDisplay(weekDate, displayElementId, inputElementId) {
+            const monday = getMondayOfWeek(new Date(weekDate));
+            const displayElement = document.getElementById(displayElementId);
+            const inputElement = document.getElementById(inputElementId);
+            
+            if (displayElement) {
+                displayElement.textContent = formatWeekRange(monday);
+            }
+            if (inputElement) {
+                inputElement.value = monday.toISOString().split('T')[0];
+            }
+        }
+
+        // Authentication Functions
+        async function authenticateEmployee(employeeId, password) {
+            try {
+                const employeeDoc = await db.collection('employees').doc(employeeId).get();
+                
+                if (!employeeDoc.exists) {
+                    throw new Error('Employee ID not found. Please check your credentials.');
+                }
+                
+                const employeeData = employeeDoc.data();
+                
+                if (employeeData.password !== password) {
+                    throw new Error('Invalid password. Please try again.');
+                }
+
+                await auth.signInAnonymously();
+                
+                currentEmployeeId = employeeId;
+                currentEmployeeData = employeeData;
+                
+                return true;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function authenticateAdmin(password) {
+            if (password === 'admin123') {
+                await auth.signInAnonymously();
+                isAdmin = true;
+                return true;
+            }
+            return false;
         }
 
         // Enhanced Geolocation
@@ -1709,24 +1956,18 @@
             });
         }
 
-        function formatLocation(location) {
-            if (!location || !location.lat || !location.lng) return 'Unknown';
-            return `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
-        }
-
         function createLocationLink(location) {
             if (!location || !location.lat || !location.lng) return 'Unknown';
-            const coords = formatLocation(location);
+            const coords = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
             const googleMapsUrl = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
             return `<a href="${googleMapsUrl}" target="_blank" class="location-link"><i class="fas fa-map-marker-alt"></i> ${coords}</a>`;
         }
 
-        // Enhanced Employee Status Management
+        // Employee Status Management
         async function updateEmployeeStatus() {
             if (!currentEmployeeId) return;
 
             try {
-                // Get the last action for this employee
                 const snapshot = await db.collection('timeLogs')
                     .where('employeeId', '==', currentEmployeeId)
                     .orderBy('timestamp', 'desc')
@@ -1737,7 +1978,6 @@
                     const lastLog = snapshot.docs[0].data();
                     const lastAction = lastLog.action;
                     
-                    // Update status based on last action
                     switch (lastAction) {
                         case 'Time In':
                             currentEmployeeStatus = 'clocked-in';
@@ -1773,7 +2013,6 @@
             const breakEndBtn = document.getElementById('btn-break-end');
             const timeOutBtn = document.getElementById('btn-time-out');
 
-            // Reset all buttons
             [timeInBtn, breakStartBtn, breakEndBtn, timeOutBtn].forEach(btn => {
                 btn.disabled = false;
                 btn.classList.remove('btn--success', 'btn--warning', 'btn--info', 'btn--danger');
@@ -1826,7 +2065,7 @@
             }
         }
 
-        // Enhanced Time Calculation
+        // Time Calculation
         function calculateWorkHours(logs) {
             let totalMinutes = 0;
             let currentSession = null;
@@ -1857,7 +2096,6 @@
                             let sessionEnd = timestamp;
                             let sessionMinutes = (sessionEnd - currentSession) / (1000 * 60);
                             
-                            // Subtract break time if there was an ongoing break
                             if (breakStart) {
                                 const breakMinutes = (sessionEnd - breakStart) / (1000 * 60);
                                 sessionMinutes -= breakMinutes;
@@ -1871,60 +2109,56 @@
                 }
             }
 
-            // Round to nearest 5 minutes
             const roundedMinutes = Math.round(totalMinutes / 5) * 5;
-            return roundedMinutes / 60; // Return hours
+            return roundedMinutes / 60;
         }
 
-        // Enhanced Time Tracking
+        // Enhanced Time Tracking with Location Verification
         async function logTimeAction(action) {
             try {
                 showLoading(true);
                 
-                // Enhanced mobile authentication
-                if (!currentUser) {
-                    console.log('No user found, attempting to sign in anonymously...');
-                    await auth.signInAnonymously();
-                    
-                    // Wait for auth state to update
-                    await new Promise((resolve) => {
-                        const unsubscribe = auth.onAuthStateChanged((user) => {
-                            if (user) {
-                                currentUser = user;
-                                unsubscribe();
-                                resolve();
-                            }
-                        });
-                    });
+                // Check location if enforcement is enabled
+                if (locationSettings.enforceLocation) {
+                    const locationValid = await checkLocationPermissions();
+                    if (!locationValid) {
+                        showPopup('You must be at the office location to clock in or out. Please move closer to the office and try again.', 'location-error', 6000);
+                        return;
+                    }
                 }
                 
-                // Verify we have a user
-                if (!currentUser) {
-                    throw new Error('Authentication failed - please refresh the page');
-                }
+                const location = currentEmployeeLocation || await getCurrentLocation();
                 
-                const location = await getCurrentLocation();
+                // Calculate distance for logging
+                let distanceFromOffice = 0;
+                if (location && locationSettings.officeLatitude && locationSettings.officeLongitude) {
+                    distanceFromOffice = calculateDistance(
+                        location.lat, 
+                        location.lng, 
+                        locationSettings.officeLatitude, 
+                        locationSettings.officeLongitude
+                    );
+                }
                 
                 await db.collection('timeLogs').add({
                     employeeId: currentEmployeeId,
+                    employeeName: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
                     action: action,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     location: location,
-                    userId: currentUser.uid
+                    distanceFromOffice: distanceFromOffice,
+                    locationEnforced: locationSettings.enforceLocation
                 });
 
                 showPopup(`${action} logged successfully!`, 'success');
                 
-                // Update employee status and refresh data
                 await updateEmployeeStatus();
                 await updateQuickStats();
                 
             } catch (error) {
                 console.error('Error logging time action:', error);
-                if (error.code === 1) { // Geolocation permission denied
+                if (error.code === 1) {
                     showPopup('Please enable location access to log time entries.', 'error');
-                } else if (error.message.includes('permission') || error.message.includes('insufficient')) {
-                    showPopup('Authentication error - please refresh the page and try again.', 'error');
                 } else {
                     showPopup(`Error logging ${action}: ${error.message}`, 'error');
                 }
@@ -1933,7 +2167,7 @@
             }
         }
 
-        // Enhanced Quick Stats
+        // Quick Stats
         async function updateQuickStats() {
             if (!currentEmployeeId) return;
 
@@ -1943,20 +2177,15 @@
                 const todayEnd = new Date(todayStart);
                 todayEnd.setDate(todayEnd.getDate() + 1);
 
-                // Get this week's start (Monday)
-                const weekStart = new Date(today);
-                const dayOfWeek = weekStart.getDay() || 7; // Sunday = 7
-                weekStart.setDate(weekStart.getDate() - dayOfWeek + 1);
+                const weekStart = getMondayOfWeek(new Date(today));
                 weekStart.setHours(0, 0, 0, 0);
 
-                // Today's logs
                 const todaySnapshot = await db.collection('timeLogs')
                     .where('employeeId', '==', currentEmployeeId)
                     .where('timestamp', '>=', todayStart)
                     .where('timestamp', '<', todayEnd)
                     .get();
 
-                // Week's logs
                 const weekSnapshot = await db.collection('timeLogs')
                     .where('employeeId', '==', currentEmployeeId)
                     .where('timestamp', '>=', weekStart)
@@ -1979,195 +2208,58 @@
             }
         }
 
-        // Enhanced Employee History
-        async function loadEmployeeHistory() {
-            try {
-                showLoading(true);
-                
-                const fromDate = document.getElementById('filter-from-date')?.value;
-                const toDate = document.getElementById('filter-to-date')?.value;
-                
-                let query = db.collection('timeLogs')
-                    .where('employeeId', '==', currentEmployeeId)
-                    .orderBy('timestamp', 'desc');
+        // Schedule Functions
+        function populateTimeDropdowns() {
+            const startSelects = document.querySelectorAll('.start-time');
+            const endSelects = document.querySelectorAll('.end-time');
 
-                if (fromDate) {
-                    const startDate = new Date(fromDate);
-                    query = query.where('timestamp', '>=', startDate);
-                }
-
-                if (toDate) {
-                    const endDate = new Date(toDate);
-                    endDate.setDate(endDate.getDate() + 1);
-                    query = query.where('timestamp', '<=', endDate);
-                }
-
-                const snapshot = await query.get();
-
-                const tbody = document.querySelector('#history-table tbody');
-                tbody.innerHTML = '';
-
-                const logs = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    logs.push(data);
-                    
-                    const row = tbody.insertRow();
-                    const timestamp = data.timestamp ? data.timestamp.toDate() : new Date();
-                    
-                    row.innerHTML = `
-                        <td>${timestamp.toLocaleDateString()}</td>
-                        <td><span class="action-badge action-${data.action.replace(/\s+/g, '-').toLowerCase()}">${data.action}</span></td>
-                        <td>${timestamp.toLocaleTimeString()}</td>
-                        <td>${createLocationLink(data.location)}</td>
-                        <td class="duration-cell" data-timestamp="${timestamp.getTime()}">Calculating...</td>
-                    `;
+            [...startSelects, ...endSelects].forEach(select => {
+                select.innerHTML = '<option value="">Select Time</option>';
+                timeSlots.forEach(time => {
+                    const option = document.createElement('option');
+                    option.value = time;
+                    option.textContent = time;
+                    select.appendChild(option);
                 });
+            });
+        }
 
-                // Calculate durations
-                calculateSessionDurations(logs);
-
-                // Calculate total hours
-                const totalHours = calculateWorkHours(logs);
-                document.getElementById('total-hours').innerHTML = `
-                    <i class="fas fa-calculator"></i>
-                    <span>Total Hours Worked: ${totalHours.toFixed(2)}</span>
-                `;
-
-                // Update history chart
-                updateHistoryChart(logs);
-
+        async function saveSchedule(scheduleData) {
+            try {
+                await db.collection('schedules').doc(`${scheduleData.employeeId}-${scheduleData.weekStart}`).set(scheduleData);
+                showPopup('Weekly schedule saved successfully!', 'success');
             } catch (error) {
-                console.error('Error loading history:', error);
-                showPopup('Error loading history: ' + error.message, 'error');
-            } finally {
-                showLoading(false);
+                console.error('Error saving schedule:', error);
+                showPopup('Error saving schedule: ' + error.message, 'error');
             }
         }
 
-        function calculateSessionDurations(logs) {
-            // Calculate duration for each session
-            logs.sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate());
-            
-            for (let i = 0; i < logs.length - 1; i++) {
-                const currentLog = logs[i];
-                const nextLog = logs[i + 1];
-                
-                const currentTime = currentLog.timestamp.toDate();
-                const nextTime = nextLog.timestamp.toDate();
-                
-                const duration = (nextTime - currentTime) / (1000 * 60); // Minutes
-                
-                const durationCell = document.querySelector(`[data-timestamp="${currentTime.getTime()}"]`);
-                if (durationCell) {
-                    if (duration > 0) {
-                        const hours = Math.floor(duration / 60);
-                        const minutes = Math.floor(duration % 60);
-                        durationCell.textContent = `${hours}h ${minutes}m`;
-                    } else {
-                        durationCell.textContent = '-';
-                    }
-                }
-            }
-            
-            // Last entry has no duration
-            const lastLog = logs[logs.length - 1];
-            if (lastLog) {
-                const lastTime = lastLog.timestamp.toDate();
-                const lastDurationCell = document.querySelector(`[data-timestamp="${lastTime.getTime()}"]`);
-                if (lastDurationCell) {
-                    lastDurationCell.textContent = '-';
-                }
+        async function loadSchedule(employeeId, weekStart) {
+            try {
+                const doc = await db.collection('schedules').doc(`${employeeId}-${weekStart}`).get();
+                return doc.exists ? doc.data() : null;
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                return null;
             }
         }
 
-        function updateHistoryChart(logs) {
-            const ctx = document.getElementById('history-chart');
-            if (!ctx) return;
-
-            // Group logs by date
-            const dailyHours = {};
-            logs.forEach(log => {
-                const date = log.timestamp.toDate().toDateString();
-                if (!dailyHours[date]) {
-                    dailyHours[date] = [];
-                }
-                dailyHours[date].push(log);
-            });
-
-            // Calculate hours per day
-            const dates = Object.keys(dailyHours).sort((a, b) => new Date(a) - new Date(b)).slice(-7); // Last 7 days
-            const hours = dates.map(date => calculateWorkHours(dailyHours[date]));
-
-            if (historyChart) {
-                historyChart.destroy();
-            }
-
-            historyChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-                    datasets: [{
-                        label: 'Hours Worked',
-                        data: hours,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 12,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + 'h';
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        }
-
-        // Enhanced Admin Functions
-        async function authenticateAdmin(password) {
-            if (password === 'admin123') {
-                await auth.signInAnonymously();
-                isAdmin = true;
-                showView('admin-dashboard');
-                await loadAdminData();
-                return true;
-            }
-            return false;
-        }
-
+        // Admin Functions
         async function loadAdminData() {
             await Promise.all([
                 loadEmployeesList(),
                 loadTimeLogsTable(),
-                loadAlertsTable(),
                 populateEmployeeDropdowns(),
-                updateAdminStats()
+                updateAdminStats(),
+                loadLocationSettings()
             ]);
         }
 
         async function updateAdminStats() {
             try {
-                // Total employees
                 const employeesSnapshot = await db.collection('employees').get();
                 document.getElementById('total-employees').textContent = employeesSnapshot.size;
 
-                // Active today (employees who clocked in today)
                 const today = new Date();
                 const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                 const todayEnd = new Date(todayStart);
@@ -2185,7 +2277,6 @@
                 });
                 document.getElementById('active-today').textContent = activeEmployees.size;
 
-                // Total hours today
                 const allTodayLogsSnapshot = await db.collection('timeLogs')
                     .where('timestamp', '>=', todayStart)
                     .where('timestamp', '<', todayEnd)
@@ -2205,12 +2296,7 @@
                     totalHoursToday += calculateWorkHours(logs);
                 });
                 document.getElementById('total-hours-today').textContent = totalHoursToday.toFixed(1);
-
-                // Pending alerts
-                const alertsSnapshot = await db.collection('alerts')
-                    .where('status', '==', 'unread')
-                    .get();
-                document.getElementById('pending-alerts').textContent = alertsSnapshot.size;
+                document.getElementById('pending-alerts').textContent = '0';
 
             } catch (error) {
                 console.error('Error updating admin stats:', error);
@@ -2229,16 +2315,13 @@
                     row.innerHTML = `
                         <td><strong>${employee.id}</strong></td>
                         <td>${employee.firstName} ${employee.lastName}</td>
-                        <td><span class="dept-badge">${employee.department || 'Unassigned'}</span></td>
+                        <td><span style="padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; background: #e0e7ff; color: #3730a3;">${employee.department || 'Unassigned'}</span></td>
                         <td>${employee.phone}</td>
                         <td>${employee.email}</td>
-                        <td><span class="status-badge active">Active</span></td>
+                        <td><span style="padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; background: #d1fae5; color: #065f46;">Active</span></td>
                         <td>
-                            <button class="btn btn--secondary btn-export" onclick="editEmployee('${employee.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn--danger btn-export" onclick="deleteEmployee('${employee.id}')">
-                                <i class="fas fa-trash"></i>
+                            <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 6px;" onclick="resetEmployeePassword('${employee.id}')">
+                                <i class="fas fa-key"></i> Reset Password
                             </button>
                         </td>
                     `;
@@ -2262,46 +2345,19 @@
                     const log = doc.data();
                     const row = tbody.insertRow();
                     const timestamp = log.timestamp ? log.timestamp.toDate() : new Date();
+                    const distance = log.distanceFromOffice ? formatDistance(log.distanceFromOffice) : 'N/A';
                     
                     row.innerHTML = `
                         <td><strong>${log.employeeId}</strong></td>
+                        <td>${log.employeeName || 'Unknown'}</td>
                         <td><span class="action-badge action-${log.action.replace(/\s+/g, '-').toLowerCase()}">${log.action}</span></td>
                         <td>${timestamp.toLocaleString()}</td>
                         <td>${createLocationLink(log.location)}</td>
-                        <td class="session-duration">-</td>
+                        <td>${distance}</td>
                     `;
                 });
             } catch (error) {
                 console.error('Error loading time logs:', error);
-            }
-        }
-
-        async function loadAlertsTable() {
-            try {
-                const snapshot = await db.collection('alerts')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-
-                const tbody = document.querySelector('#alerts-table tbody');
-                tbody.innerHTML = '';
-
-                snapshot.forEach(doc => {
-                    const alert = doc.data();
-                    const row = tbody.insertRow();
-                    const timestamp = alert.timestamp ? alert.timestamp.toDate() : new Date();
-                    
-                    row.innerHTML = `
-                        <td><span class="status-badge ${alert.priority || 'medium'}">${alert.priority || 'Medium'}</span></td>
-                        <td><strong>${alert.employeeId}</strong></td>
-                        <td>${alert.type}</td>
-                        <td>${alert.message}</td>
-                        <td>${timestamp.toLocaleString()}</td>
-                        <td><span class="status-badge ${alert.status || 'unread'}">${alert.status || 'Unread'}</span></td>
-                    `;
-                });
-            } catch (error) {
-                console.error('Error loading alerts:', error);
             }
         }
 
@@ -2311,14 +2367,12 @@
                 
                 const dropdowns = [
                     document.getElementById('schedule-employee'),
-                    document.getElementById('view-schedule-employee'),
-                    document.getElementById('logs-employee-filter')
+                    document.getElementById('view-schedule-employee')
                 ];
 
                 dropdowns.forEach(dropdown => {
                     if (!dropdown) return;
                     
-                    // Clear existing options except the first one
                     while (dropdown.children.length > 1) {
                         dropdown.removeChild(dropdown.lastChild);
                     }
@@ -2360,7 +2414,7 @@
             for (let i = 1; i < table.rows.length; i++) {
                 const row = table.rows[i];
                 const rowData = [];
-                for (let j = 0; j < row.cells.length - 1; j++) { // Exclude actions column
+                for (let j = 0; j < row.cells.length - 1; j++) {
                     rowData.push('"' + row.cells[j].textContent.replace(/"/g, '""') + '"');
                 }
                 csv += rowData.join(',') + '\n';
@@ -2371,7 +2425,7 @@
 
         function exportTimeLogsToCSV() {
             const table = document.getElementById('timelogs-table');
-            let csv = 'Employee ID,Action,Timestamp,Location,Duration\n';
+            let csv = 'Employee ID,Employee Name,Action,Timestamp,Location,Distance\n';
             
             for (let i = 1; i < table.rows.length; i++) {
                 const row = table.rows[i];
@@ -2407,99 +2461,258 @@
             showPopup('Time logs refreshed!', 'info');
         }
 
-        function markAllAlertsRead() {
-            showPopup('All alerts marked as read!', 'success');
-        }
-
-        function clearOldAlerts() {
-            showPopup('Old alerts cleared!', 'info');
-        }
-
-        function editEmployee(employeeId) {
-            showPopup(`Edit feature for ${employeeId} coming soon!`, 'info');
-        }
-
-        function deleteEmployee(employeeId) {
-            if (confirm(`Are you sure you want to delete employee ${employeeId}?`)) {
-                // Implement delete functionality
-                showPopup(`Employee ${employeeId} deleted!`, 'warning');
-            }
-        }
-
-        // Schedule Functions
-        function populateTimeDropdowns() {
-            const startSelects = document.querySelectorAll('.start-time');
-            const endSelects = document.querySelectorAll('.end-time');
-
-            [...startSelects, ...endSelects].forEach(select => {
-                select.innerHTML = '<option value="">Select Time</option>';
-                timeSlots.forEach(time => {
-                    const option = document.createElement('option');
-                    option.value = time;
-                    option.textContent = time;
-                    select.appendChild(option);
+        function resetEmployeePassword(employeeId) {
+            const newPassword = prompt(`Enter new password for employee ${employeeId}:`);
+            if (newPassword && newPassword.length >= 6) {
+                db.collection('employees').doc(employeeId).update({
+                    password: newPassword
+                }).then(() => {
+                    showPopup(`Password reset successfully for ${employeeId}`, 'success');
+                }).catch((error) => {
+                    showPopup('Error resetting password: ' + error.message, 'error');
                 });
-            });
-        }
-
-        async function saveSchedule(scheduleData) {
-            try {
-                await db.collection('schedules').doc(`${scheduleData.employeeId}-${scheduleData.weekStart}`).set(scheduleData);
-                showPopup('Schedule saved successfully!', 'success');
-            } catch (error) {
-                console.error('Error saving schedule:', error);
-                showPopup('Error saving schedule: ' + error.message, 'error');
+            } else if (newPassword !== null) {
+                showPopup('Password must be at least 6 characters long', 'error');
             }
         }
 
-        async function loadSchedule(employeeId, weekStart) {
+        // Load Employee History
+        async function loadEmployeeHistory() {
             try {
-                const doc = await db.collection('schedules').doc(`${employeeId}-${weekStart}`).get();
-                return doc.exists ? doc.data() : null;
-            } catch (error) {
-                console.error('Error loading schedule:', error);
-                return null;
-            }
-        }
-
-        // Enhanced Initialization
-        async function initializeApp() {
-            try {
-                // Force anonymous authentication on app start
-                if (!auth.currentUser) {
-                    console.log('Signing in anonymously...');
-                    await auth.signInAnonymously();
-                }
+                showLoading(true);
                 
-                const urlParams = new URLSearchParams(window.location.search);
-                const employeeId = urlParams.get('id');
+                const fromDate = document.getElementById('filter-from-date')?.value;
+                const toDate = document.getElementById('filter-to-date')?.value;
+                
+                let query = db.collection('timeLogs')
+                    .where('employeeId', '==', currentEmployeeId)
+                    .orderBy('timestamp', 'desc');
 
-                if (employeeId) {
-                    // Employee interface
-                    currentEmployeeId = employeeId;
-                    document.querySelector('.employee-id').textContent = `Employee ID: ${employeeId}`;
-                    showView('employee-view');
+                if (fromDate) {
+                    const startDate = new Date(fromDate);
+                    query = query.where('timestamp', '>=', startDate);
+                }
+
+                if (toDate) {
+                    const endDate = new Date(toDate);
+                    endDate.setDate(endDate.getDate() + 1);
+                    query = query.where('timestamp', '<=', endDate);
+                }
+
+                const snapshot = await query.get();
+                const tbody = document.querySelector('#history-table tbody');
+                tbody.innerHTML = '';
+
+                const logs = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    logs.push(data);
                     
-                    // Start time display and update status
-                    startTimeDisplay();
-                    await updateEmployeeStatus();
-                    await updateQuickStats();
-                } else {
-                    // Admin login
-                    showView('admin-login');
+                    const row = tbody.insertRow();
+                    const timestamp = data.timestamp ? data.timestamp.toDate() : new Date();
+                    
+                    row.innerHTML = `
+                        <td>${timestamp.toLocaleDateString()}</td>
+                        <td><span class="action-badge action-${data.action.replace(/\s+/g, '-').toLowerCase()}">${data.action}</span></td>
+                        <td>${timestamp.toLocaleTimeString()}</td>
+                        <td>${createLocationLink(data.location)}</td>
+                        <td>-</td>
+                    `;
+                });
+
+                const totalHours = calculateWorkHours(logs);
+                document.getElementById('total-hours').innerHTML = `
+                    <i class="fas fa-calculator"></i>
+                    <span>Total Hours Worked: ${totalHours.toFixed(2)}</span>
+                `;
+
+            } catch (error) {
+                console.error('Error loading history:', error);
+                showPopup('Error loading history: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Generate Weekly Report
+        async function generateWeeklyReport(weekStart) {
+            try {
+                showLoading(true);
+                
+                const start = new Date(weekStart);
+                const end = new Date(start);
+                end.setDate(end.getDate() + 7);
+                
+                const snapshot = await db.collection('timeLogs')
+                    .where('timestamp', '>=', start)
+                    .where('timestamp', '<=', end)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                const employeeLogs = {};
+                snapshot.forEach(doc => {
+                    const log = doc.data();
+                    if (!employeeLogs[log.employeeId]) {
+                        employeeLogs[log.employeeId] = [];
+                    }
+                    employeeLogs[log.employeeId].push(log);
+                });
+
+                let reportHtml = `
+                    <div style="background: var(--gray-50); padding: 25px; border-radius: var(--border-radius); margin-bottom: 25px; border-left: 4px solid var(--primary-color);">
+                        <h4 style="margin-bottom: 15px; color: var(--gray-800);"><i class="fas fa-chart-line"></i> Weekly Report</h4>
+                        <p style="margin: 5px 0; color: var(--gray-600);"><strong>Period:</strong> ${start.toLocaleDateString()} - ${end.toLocaleDateString()}</p>
+                        <p style="margin: 5px 0; color: var(--gray-600);"><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+                    <table style="width: 100%; margin-top: 25px; background: white; border: 1px solid var(--gray-300); border-radius: var(--border-radius); overflow: hidden;">
+                        <thead>
+                            <tr style="background: var(--primary-color); color: white;">
+                                <th style="padding: 15px 12px;">Employee ID</th>
+                                <th style="padding: 15px 12px;">Employee Name</th>
+                                <th style="padding: 15px 12px;">Total Hours</th>
+                                <th style="padding: 15px 12px;">Days Worked</th>
+                                <th style="padding: 15px 12px;">Avg Hours/Day</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                let totalHours = 0;
+                let totalEmployees = 0;
+
+                for (const [employeeId, logs] of Object.entries(employeeLogs)) {
+                    const hours = calculateWorkHours(logs);
+                    const daysWorked = [...new Set(logs.map(log => log.timestamp.toDate().toDateString()))].length;
+                    const avgHours = daysWorked > 0 ? (hours / daysWorked) : 0;
+                    const employeeName = logs[0].employeeName || 'Unknown';
+                    
+                    totalHours += hours;
+                    totalEmployees++;
+                    
+                    reportHtml += `<tr style="border-bottom: 1px solid var(--gray-200);">
+                        <td style="padding: 15px 12px;"><strong>${employeeId}</strong></td>
+                        <td style="padding: 15px 12px;">${employeeName}</td>
+                        <td style="padding: 15px 12px;">${hours.toFixed(2)}</td>
+                        <td style="padding: 15px 12px;">${daysWorked}</td>
+                        <td style="padding: 15px 12px;">${avgHours.toFixed(2)}</td>
+                    </tr>`;
                 }
 
-                populateTimeDropdowns();
-                setupEventListeners();
-                
+                reportHtml += `
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: var(--primary-color); color: white; font-weight: bold;">
+                                <td style="padding: 15px 12px;">TOTALS</td>
+                                <td style="padding: 15px 12px;">${totalEmployees} Employees</td>
+                                <td style="padding: 15px 12px;">${totalHours.toFixed(2)}</td>
+                                <td style="padding: 15px 12px;">-</td>
+                                <td style="padding: 15px 12px;">${totalEmployees > 0 ? (totalHours / totalEmployees).toFixed(2) : '0.00'}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+
+                document.getElementById('report-content').innerHTML = reportHtml;
+
             } catch (error) {
-                console.error('Initialization error:', error);
-                showPopup('App initialization failed - please refresh the page', 'error');
+                console.error('Error generating report:', error);
+                showPopup('Error generating report: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
             }
+        }
+
+        // Initialization
+        function initializeApp() {
+            showView('login-view');
+            populateTimeDropdowns();
+            setupEventListeners();
+            
+            // Initialize week pickers
+            updateWeekDisplay(currentWeek, 'week-display', 'selected-week-start');
+            updateWeekDisplay(viewCurrentWeek, 'view-week-display', 'view-selected-week-start');
+            updateWeekDisplay(reportCurrentWeek, 'report-week-display', 'report-selected-week-start');
         }
 
         // Enhanced Event Listeners Setup
         function setupEventListeners() {
+            // Login tab switching
+            document.querySelectorAll('.login-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabType = tab.getAttribute('data-tab');
+                    
+                    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    document.querySelectorAll('.login-form').forEach(form => form.style.display = 'none');
+                    document.getElementById(`${tabType}-login-form`).style.display = 'block';
+                });
+            });
+
+            // Employee login form
+            document.getElementById('employee-login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const employeeId = document.getElementById('employee-id').value;
+                const password = document.getElementById('employee-password').value;
+                
+                try {
+                    showLoading(true);
+                    await authenticateEmployee(employeeId, password);
+                    
+                    document.getElementById('employee-name').textContent = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
+                    document.getElementById('employee-dept').textContent = currentEmployeeData.department || 'No Department';
+                    
+                    showView('employee-view');
+                    startTimeDisplay();
+                    await Promise.all([
+                        updateEmployeeStatus(),
+                        updateQuickStats(),
+                        loadLocationSettings(),
+                        checkLocationPermissions()
+                    ]);
+                    
+                    showPopup(`Welcome back, ${currentEmployeeData.firstName}!`, 'success');
+                } catch (error) {
+                    showPopup(error.message, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            });
+
+            // Admin login form
+            document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const password = document.getElementById('admin-password').value;
+                
+                if (await authenticateAdmin(password)) {
+                    showView('admin-dashboard');
+                    await loadAdminData();
+                    showPopup('Welcome to admin dashboard!', 'success');
+                } else {
+                    showPopup('Invalid admin password!', 'error');
+                }
+            });
+
+            // Logout buttons
+            document.getElementById('employee-logout')?.addEventListener('click', () => {
+                currentEmployeeId = null;
+                currentEmployeeData = null;
+                auth.signOut();
+                stopTimeDisplay();
+                showView('login-view');
+                document.getElementById('employee-login-form').reset();
+                showPopup('Logged out successfully!', 'info');
+            });
+
+            document.getElementById('admin-logout')?.addEventListener('click', () => {
+                isAdmin = false;
+                auth.signOut();
+                showView('login-view');
+                document.getElementById('admin-login-form').reset();
+                showPopup('Admin logged out successfully!', 'info');
+            });
+
             // Time tracking buttons
             document.querySelectorAll('.tracking-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -2531,55 +2744,67 @@
                 loadEmployeeHistory();
             });
 
-            // Admin login form
-            document.getElementById('login-form')?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const password = document.getElementById('admin-password').value;
-                
-                if (await authenticateAdmin(password)) {
-                    showPopup('Login successful! Welcome to the admin dashboard.', 'success');
-                } else {
-                    showPopup('Invalid password! Please try again.', 'error');
-                }
-            });
-
-            // Admin logout
-            document.getElementById('admin-logout')?.addEventListener('click', () => {
-                isAdmin = false;
-                auth.signOut();
-                showView('admin-login');
-                document.getElementById('admin-password').value = '';
-                showPopup('Successfully logged out.', 'info');
-            });
-
             // Admin tabs
             document.querySelectorAll('.admin-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabName = tab.getAttribute('data-tab');
                     
-                    // Update active tab
                     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     
-                    // Show corresponding content
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                     document.getElementById(`${tabName}-tab`).classList.add('active');
                 });
             });
 
-            // Schedule sub-tabs
-            document.querySelectorAll('.schedule-sub-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const subtab = tab.getAttribute('data-subtab');
-                    
-                    document.querySelectorAll('.schedule-sub-tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    document.querySelectorAll('.schedule-subtab-content').forEach(content => {
-                        content.style.display = 'none';
-                    });
-                    document.getElementById(`${subtab}-schedule`).style.display = 'block';
-                });
+            // Location settings toggle
+            document.getElementById('location-enforcement-toggle')?.addEventListener('click', () => {
+                locationSettings.enforceLocation = !locationSettings.enforceLocation;
+                updateLocationSettingsDisplay();
+            });
+
+            // Save location settings
+            document.getElementById('save-location-settings')?.addEventListener('click', async () => {
+                locationSettings.maxDistance = parseInt(document.getElementById('max-distance').value) || 100;
+                locationSettings.officeAddress = document.getElementById('office-address').value;
+                locationSettings.officeLatitude = parseFloat(document.getElementById('office-latitude').value) || 39.0438;
+                locationSettings.officeLongitude = parseFloat(document.getElementById('office-longitude').value) || -77.3933;
+                
+                await saveLocationSettings();
+            });
+
+            // Geocode address
+            document.getElementById('geocode-address')?.addEventListener('click', geocodeAddress);
+
+            // Week navigation buttons
+            document.getElementById('prev-week')?.addEventListener('click', () => {
+                currentWeek.setDate(currentWeek.getDate() - 7);
+                updateWeekDisplay(currentWeek, 'week-display', 'selected-week-start');
+            });
+
+            document.getElementById('next-week')?.addEventListener('click', () => {
+                currentWeek.setDate(currentWeek.getDate() + 7);
+                updateWeekDisplay(currentWeek, 'week-display', 'selected-week-start');
+            });
+
+            document.getElementById('view-prev-week')?.addEventListener('click', () => {
+                viewCurrentWeek.setDate(viewCurrentWeek.getDate() - 7);
+                updateWeekDisplay(viewCurrentWeek, 'view-week-display', 'view-selected-week-start');
+            });
+
+            document.getElementById('view-next-week')?.addEventListener('click', () => {
+                viewCurrentWeek.setDate(viewCurrentWeek.getDate() + 7);
+                updateWeekDisplay(viewCurrentWeek, 'view-week-display', 'view-selected-week-start');
+            });
+
+            document.getElementById('report-prev-week')?.addEventListener('click', () => {
+                reportCurrentWeek.setDate(reportCurrentWeek.getDate() - 7);
+                updateWeekDisplay(reportCurrentWeek, 'report-week-display', 'report-selected-week-start');
+            });
+
+            document.getElementById('report-next-week')?.addEventListener('click', () => {
+                reportCurrentWeek.setDate(reportCurrentWeek.getDate() + 7);
+                updateWeekDisplay(reportCurrentWeek, 'report-week-display', 'report-selected-week-start');
             });
 
             // Add employee form
@@ -2593,6 +2818,7 @@
                     phone: document.getElementById('emp-phone').value,
                     email: document.getElementById('emp-email').value,
                     department: document.getElementById('emp-department').value,
+                    password: document.getElementById('emp-initial-password').value,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     status: 'active'
                 };
@@ -2609,12 +2835,17 @@
                 }
             });
 
+            // Password strength checker
+            document.getElementById('emp-initial-password')?.addEventListener('input', (e) => {
+                checkPasswordStrength(e.target.value);
+            });
+
             // Schedule form
             document.getElementById('schedule-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const employeeId = document.getElementById('schedule-employee').value;
-                const weekStart = document.getElementById('schedule-week').value;
+                const weekStart = document.getElementById('selected-week-start').value;
                 
                 const scheduleData = {
                     employeeId: employeeId,
@@ -2623,7 +2854,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // Collect schedule data for each day
                 daysOfWeek.forEach(day => {
                     const row = document.querySelector(`tr[data-day="${day}"]`);
                     const startTime = row.querySelector('.start-time').value;
@@ -2642,7 +2872,7 @@
                 await saveSchedule(scheduleData);
             });
 
-            // Copy schedule to all working days
+            // Copy schedule button
             document.getElementById('copy-schedule')?.addEventListener('click', () => {
                 const mondayRow = document.querySelector('tr[data-day="monday"]');
                 const mondayStart = mondayRow.querySelector('.start-time').value;
@@ -2654,7 +2884,7 @@
                     return;
                 }
 
-                daysOfWeek.slice(1).forEach(day => { // Skip Monday (index 0)
+                daysOfWeek.slice(1).forEach(day => {
                     const row = document.querySelector(`tr[data-day="${day}"]`);
                     const notWorking = row.querySelector('.not-working').checked;
                     
@@ -2671,7 +2901,7 @@
             // Load schedule button
             document.getElementById('load-schedule')?.addEventListener('click', async () => {
                 const employeeId = document.getElementById('view-schedule-employee').value;
-                const weekStart = document.getElementById('view-schedule-week').value;
+                const weekStart = document.getElementById('view-selected-week-start').value;
                 
                 if (!employeeId || !weekStart) {
                     showPopup('Please select employee and week', 'error');
@@ -2682,7 +2912,7 @@
                 const displayDiv = document.getElementById('schedule-display');
                 
                 if (schedule) {
-                    let html = '<table class="schedule-table"><thead><tr><th>Day</th><th>Start</th><th>End</th><th>Break</th><th>Status</th></tr></thead><tbody>';
+                    let html = '<table style="width: 100%; margin-top: 25px; background: white; border: 1px solid var(--gray-300); border-radius: var(--border-radius); overflow: hidden;"><thead><tr style="background: var(--primary-color); color: white;"><th style="padding: 15px 12px;">Day</th><th style="padding: 15px 12px;">Start</th><th style="padding: 15px 12px;">End</th><th style="padding: 15px 12px;">Break</th><th style="padding: 15px 12px;">Status</th></tr></thead><tbody>';
                     
                     daysOfWeek.forEach(day => {
                         const dayData = schedule.schedule[day] || {};
@@ -2691,12 +2921,12 @@
                         const end = dayData.end || '-';
                         const breakTime = dayData.breakDuration ? `${dayData.breakDuration} min` : '-';
                         
-                        html += `<tr>
-                            <td><strong>${day.charAt(0).toUpperCase() + day.slice(1)}</strong></td>
-                            <td>${start}</td>
-                            <td>${end}</td>
-                            <td>${breakTime}</td>
-                            <td><span class="status-badge ${status.toLowerCase().replace(' ', '-')}">${status}</span></td>
+                        html += `<tr style="border-bottom: 1px solid var(--gray-200);">
+                            <td style="padding: 15px 12px;"><strong>${day.charAt(0).toUpperCase() + day.slice(1)}</strong></td>
+                            <td style="padding: 15px 12px;">${start}</td>
+                            <td style="padding: 15px 12px;">${end}</td>
+                            <td style="padding: 15px 12px;">${breakTime}</td>
+                            <td style="padding: 15px 12px;"><span style="padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; ${status === 'Working' ? 'background: #d1fae5; color: #065f46;' : 'background: #fef3c7; color: #92400e;'}">${status}</span></td>
                         </tr>`;
                     });
                     
@@ -2709,20 +2939,14 @@
 
             // Generate report button
             document.getElementById('generate-report')?.addEventListener('click', async () => {
-                const reportType = document.getElementById('report-type').value;
-                const weekStart = document.getElementById('report-week').value;
+                const weekStart = document.getElementById('report-selected-week-start').value;
                 
-                if (!weekStart && reportType !== 'monthly') {
-                    showPopup('Please select a date', 'error');
+                if (!weekStart) {
+                    showPopup('Please select a week', 'error');
                     return;
                 }
 
-                await generateAdvancedReport(reportType, weekStart);
-            });
-
-            // Popup close button
-            document.querySelector('.popup-close')?.addEventListener('click', () => {
-                document.getElementById('popup').classList.add('hidden');
+                await generateWeeklyReport(weekStart);
             });
 
             // Not working checkboxes
@@ -2748,118 +2972,10 @@
                 });
             });
 
-            // Filter buttons
-            document.getElementById('apply-logs-filter')?.addEventListener('click', () => {
-                loadTimeLogsTable(); // Implement filtering logic
+            // Popup close button
+            document.querySelector('.popup-close')?.addEventListener('click', () => {
+                document.getElementById('popup').classList.add('hidden');
             });
-        }
-
-        // Advanced Report Generation
-        async function generateAdvancedReport(reportType, startDate) {
-            try {
-                showLoading(true);
-                
-                let query = db.collection('timeLogs').orderBy('timestamp', 'desc');
-                let reportTitle = '';
-                let dateRange = '';
-                
-                const start = new Date(startDate);
-                let end = new Date(start);
-                
-                switch (reportType) {
-                    case 'weekly':
-                        end.setDate(end.getDate() + 7);
-                        reportTitle = 'Weekly Report';
-                        dateRange = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
-                        break;
-                    case 'monthly':
-                        start.setDate(1); // First day of month
-                        end = new Date(start.getFullYear(), start.getMonth() + 1, 0); // Last day of month
-                        reportTitle = 'Monthly Report';
-                        dateRange = start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                        break;
-                    default:
-                        reportTitle = 'Custom Report';
-                        dateRange = startDate;
-                }
-                
-                query = query.where('timestamp', '>=', start).where('timestamp', '<=', end);
-                
-                const snapshot = await query.get();
-                const employeeLogs = {};
-                
-                snapshot.forEach(doc => {
-                    const log = doc.data();
-                    if (!employeeLogs[log.employeeId]) {
-                        employeeLogs[log.employeeId] = [];
-                    }
-                    employeeLogs[log.employeeId].push(log);
-                });
-
-                let reportHtml = `
-                    <div class="report-header">
-                        <h4><i class="fas fa-chart-line"></i> ${reportTitle}</h4>
-                        <p><strong>Period:</strong> ${dateRange}</p>
-                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-                    </div>
-                    <table class="schedule-table">
-                        <thead>
-                            <tr>
-                                <th>Employee ID</th>
-                                <th>Total Hours</th>
-                                <th>Days Worked</th>
-                                <th>Avg Hours/Day</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                let totalHours = 0;
-                let totalEmployees = 0;
-
-                for (const [employeeId, logs] of Object.entries(employeeLogs)) {
-                    const hours = calculateWorkHours(logs);
-                    const daysWorked = [...new Set(logs.map(log => log.timestamp.toDate().toDateString()))].length;
-                    const avgHours = daysWorked > 0 ? (hours / daysWorked) : 0;
-                    
-                    totalHours += hours;
-                    totalEmployees++;
-                    
-                    const status = hours >= 40 ? 'Full Time' : hours >= 20 ? 'Part Time' : 'Minimal';
-                    const statusClass = hours >= 40 ? 'active' : hours >= 20 ? 'warning' : 'unread';
-                    
-                    reportHtml += `<tr>
-                        <td><strong>${employeeId}</strong></td>
-                        <td>${hours.toFixed(2)}</td>
-                        <td>${daysWorked}</td>
-                        <td>${avgHours.toFixed(2)}</td>
-                        <td><span class="status-badge ${statusClass}">${status}</span></td>
-                    </tr>`;
-                }
-
-                reportHtml += `
-                        </tbody>
-                        <tfoot>
-                            <tr style="background: var(--primary-color); color: white; font-weight: bold;">
-                                <td>TOTALS</td>
-                                <td>${totalHours.toFixed(2)}</td>
-                                <td>-</td>
-                                <td>${totalEmployees > 0 ? (totalHours / totalEmployees).toFixed(2) : '0.00'}</td>
-                                <td>${totalEmployees} Employees</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                `;
-
-                document.getElementById('report-content').innerHTML = reportHtml;
-
-            } catch (error) {
-                console.error('Error generating report:', error);
-                showPopup('Error generating report: ' + error.message, 'error');
-            } finally {
-                showLoading(false);
-            }
         }
 
         // Initialize the app when the page loads
@@ -2873,7 +2989,6 @@
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             stopTimeDisplay();
-            realTimeListeners.forEach(unsubscribe => unsubscribe());
         });
     </script>
 </body>
